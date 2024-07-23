@@ -15,7 +15,7 @@
 ###############################################################################
 # Create the develop, test, and build environment
 ###############################################################################
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.7
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.10-1018
 
 ARG GOLANG_VERSION=1.18.9
 ARG OPENSHIFT_VERSION=4.9
