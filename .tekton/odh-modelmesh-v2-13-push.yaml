@@ -22,7 +22,7 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/rhoai-tenant/rhoai-v2-13/odh-modelmesh-v2-13:{{revision}}
+    value: quay.io/rhoai/odh-modelmesh-rhel8:{{revision}}
   - name: dockerfile
     value: Dockerfile
   - name: path-context
