@@ -1,0 +1,170 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: pnc-cli-build
+  namespace: {{namespace}}
+spec:
+  params:
+  ## TO BE CHANGED WITH REQUIRED VALUES ##
+  ## TOOK THE BELOW VALUES FROM NIGHTLY CPaaS RUNS --> https://jenkins-cpaas-rhods.apps.cpaas-poc.r6c9.p1.openshiftapps.com/job/rhoai-2.14-rhel-8/job/managed-open-data-hub/job/odh-pig/job/odh-pig-artifacts/
+  ## WHICH TRIGGER BUILDS in https://orch.psi.redhat.com/pnc-web/#/group-configs/2319
+  - name: build-config-git-url
+    value: 'https://gitlab.cee.redhat.com/data-hub/rhods-cpaas-midstream.git'
+  - name: build-config-revision
+    value: 'rhoai-2.14-rhel-8'
+  - name: build-config-path
+    value: 'odh-pig-builds/build-config.yaml'
+
+  ## PROFILE SHOULD BE EITHER STAGE or PROD
+  - name: pnc-profile
+    value: 'prod'
+  ## CHANGE WITH YOUR SERVICE ACCOUNT CREDENTIALS. THE SVC ACCOUNT NAME USED IS "service-account-cpaas-pnc-prod-oidc-sa"
+  - name: svc-account-name
+    value: "{{svc_account_name}}"
+  - name: svc-account-secret
+    value: "{{svc_account_secret}}"
+
+  ## YOU SHOULD NOT NEED TO CHANGE THESE, THIS CONTAINS A PNC-CLI CONFIGURATION FILE TEMPLATE 
+  - name: pnc-cli-config-git-url
+    value: 'https://gitlab.cee.redhat.com/project-ncl/utils.git'
+  - name: pnc-cli-config-revision
+    value: 'master'
+
+  pipelineSpec:
+    params:
+    - name: build-config-git-url
+      description: Source Repository URL containing the build configuration
+      type: string
+    - name: build-config-revision
+      default: ""
+      description: Revision of the Source Repository containing the build configuration
+      type: string
+    - name: build-config-path
+      default: "build-config.yaml"
+      description: Full path of the build configuration file
+      type: string
+
+    - description: Source Repository URL containing the PNC CLI configuration
+      name: pnc-cli-config-git-url
+      type: string
+    - default: ""
+      description: Revision of the Source Repository containing the PNC CLI configuration
+      name: pnc-cli-config-revision
+      type: string
+
+    - description: The profile to be used (declared in the pnc-cli configuration file; possible options are "prod" or "stage")
+      name: pnc-profile
+      type: string
+    - description: The service account name to be used for PNC authentication against corporate SSO
+      name: svc-account-name
+      type: string
+    - description: The service account secret
+      name: svc-account-secret
+      type: string
+
+    tasks:
+    - name: clone-build-config-repository
+      params:
+      - name: url
+        value: $(params.build-config-git-url)
+      - name: revision
+        value: $(params.build-config-revision)
+      - name: subdirectory
+        value: build-config
+      - name: sslVerify
+        value: false
+      taskRef:
+        params:
+        - name: name
+          value: git-clone
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:0bb1be8363557e8e07ec34a3c5daaaaa23c9d533f0bb12f00dc604d00de50814
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+      - name: output
+        workspace: workspace
+      - name: basic-auth
+        workspace: git-auth
+
+    - name: clone-pnc-cli-config-repository
+      params:
+      - name: url
+        value: $(params.pnc-cli-config-git-url)
+      - name: revision
+        value: $(params.pnc-cli-config-revision)
+      - name: subdirectory
+        value: cli-config
+      - name: sslVerify
+        value: false
+      runAfter:
+      - clone-build-config-repository
+      taskRef:
+        params:
+        - name: name
+          value: git-clone
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:0bb1be8363557e8e07ec34a3c5daaaaa23c9d533f0bb12f00dc604d00de50814
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+      - name: output
+        workspace: workspace
+      - name: basic-auth
+        workspace: git-auth
+
+    - name: pnc-cli-build
+      runAfter:
+      - clone-pnc-cli-config-repository
+      taskSpec:
+        steps:
+          - name: run-pnc-build
+            image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:64de07fb16f9a31799f1e020df9f4fc1015212dc
+            env:
+              - name: SSO_SERVICE_ACCOUNT_NAME
+                value: $(params.svc-account-name)
+              - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
+                value: $(params.svc-account-secret)
+            script: |
+              #!/bin/bash
+              set -e
+              set -x
+              
+              echo "Starting a PNC build..."
+              echo -n "\n=== Build config ==="
+              cat /workspace/output/build-config/$(params.build-config-path)
+
+              cp /workspace/output/build-config/$(params.build-config-path) /workspace/output
+              envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /workspace/output/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/output/config.yaml
+
+              java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile $(params.pnc-profile) --jsonOutput
+      workspaces:
+      - name: output
+        workspace: workspace
+
+    workspaces:
+    - name: workspace
+    - name: git-auth
+      optional: true
+
+  workspaces:
+  - name: workspace
+    volumeClaimTemplate:
+      metadata:
+        creationTimestamp: null
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+      status: {}
+  - name: git-auth
+    secret:
+      ## TO BE REPLACED WITH YOUR GITLAB SECRET. 
+      ## NOTE: https://gitlab.cee.redhat.com/konflux/docs/users/-/blob/main/topics/getting-started/components-applications.md#gitlab-token-secret links to 
+      ## https://konflux-ci.dev/docs/how-tos/configuring/creating-secrets/#creating-source-control-secrets which suggests not to use the Gitlab username in the secret but only the password.
+      ## However, task "git-clone" seems to expect the username to be present: https://github.com/konflux-ci/build-definitions/blob/main/task/git-clone/0.1/git-clone.yaml#L173C22-L173C57 ? (I had to specify the username to make it work)
+      secretName: "{{secretName}}"
