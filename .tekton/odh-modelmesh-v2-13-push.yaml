@@ -311,9 +311,6 @@ spec:
               set -x
               
               echo "Starting a PNC build..."
-              
-              echo "Service Account Name: $SSO_SERVICE_ACCOUNT_NAME"
-              echo "Service Account Secret: $SSO_SERVICE_ACCOUNT_CLIENT_SECRET"
 
               echo -n "\n=== Build config ==="
               cat /workspace/output/build-config/$(params.build-config-path)
@@ -324,7 +321,7 @@ spec:
               echo "Service Account Name: $SSO_SERVICE_ACCOUNT_NAME"
               echo "Service Account Secret: $SSO_SERVICE_ACCOUNT_CLIENT_SECRET"
               
-              java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile $(params.pnc-profile) --jsonOutput
+              java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile ${PNC_PROFILE} --jsonOutput
       workspaces:
       - name: output
         workspace: workspace
