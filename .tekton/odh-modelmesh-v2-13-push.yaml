@@ -37,9 +37,9 @@ spec:
   - name: pnc-profile
     value: 'prod'
   - name: svc-account-name
-    value: 'pnc-oidc-sa'
-  - name: svc-account-secret
     value: 'rhoai-pnc-oidc-sa'
+  - name: svc-account-secret
+    value: 'pnc-secret'
   - name: pnc-cli-config-git-url
     value: 'https://gitlab.cee.redhat.com/project-ncl/utils.git'
   - name: pnc-cli-config-revision
@@ -106,11 +106,11 @@ spec:
     - description: The service account name to be used for PNC authentication against corporate SSO
       name: svc-account-name
       type: string
-      default: "pnc-oidc-sa"
+      default: "rhoai-pnc-oidc-sa"
     - description: The service account secret
       name: svc-account-secret
       type: string
-      default: "rhoai-pnc-oidc-sa"
+      default: "pnc-secret"
       
     - description: Source Repository URL
       name: git-url
