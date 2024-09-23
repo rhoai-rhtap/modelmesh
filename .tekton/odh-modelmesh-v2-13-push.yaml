@@ -219,6 +219,86 @@ spec:
         workspace: workspace
       - name: basic-auth
         workspace: git-auth
+    - name: clone-build-config-repository
+      params:
+      - name: url
+        value: $(params.build-config-git-url)
+      - name: revision
+        value: $(params.build-config-revision)
+      - name: subdirectory
+        value: build-config
+      - name: sslVerify
+        value: false
+      taskRef:
+        params:
+        - name: name
+          value: git-clone
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:0bb1be8363557e8e07ec34a3c5daaaaa23c9d533f0bb12f00dc604d00de50814
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+      - name: output
+        workspace: workspace
+      - name: basic-auth
+        workspace: git-auth
+
+    - name: clone-pnc-cli-config-repository
+      params:
+      - name: url
+        value: $(params.pnc-cli-config-git-url)
+      - name: revision
+        value: $(params.pnc-cli-config-revision)
+      - name: subdirectory
+        value: cli-config
+      - name: sslVerify
+        value: false
+      runAfter:
+      - clone-build-config-repository
+      taskRef:
+        params:
+        - name: name
+          value: git-clone
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:0bb1be8363557e8e07ec34a3c5daaaaa23c9d533f0bb12f00dc604d00de50814
+        - name: kind
+          value: task
+        resolver: bundles
+      workspaces:
+      - name: output
+        workspace: workspace
+      - name: basic-auth
+        workspace: git-auth
+
+    - name: pnc-cli-build
+      runAfter:
+      - clone-pnc-cli-config-repository
+      taskSpec:
+        steps:
+          - name: run-pnc-build
+            image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:64de07fb16f9a31799f1e020df9f4fc1015212dc
+            env:
+              - name: SSO_SERVICE_ACCOUNT_NAME
+                value: $(params.svc-account-name)
+              - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
+                value: $(params.svc-account-secret)
+            script: |
+              #!/bin/bash
+              set -e
+              set -x
+              
+              echo "Starting a PNC build..."
+              echo -n "\n=== Build config ==="
+              cat /workspace/output/build-config/$(params.build-config-path)
+
+              cp /workspace/output/build-config/$(params.build-config-path) /workspace/output
+              envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /workspace/output/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/output/config.yaml
+
+              java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile $(params.pnc-profile) --jsonOutput
+      workspaces:
+      - name: output
+        workspace: workspace
     - name: prefetch-dependencies
       params:
       - name: input
