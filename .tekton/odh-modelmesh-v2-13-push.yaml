@@ -30,7 +30,7 @@ spec:
   - name: build-config-git-url
     value: 'https://github.com/rhoai-rhtap/RHOAI-Build-Config.git'
   - name: build-config-revision
-    value: 'rhoai-2.14-rhel-8'
+    value: 'rhoai-2.13'
   - name: build-config-path
     value: 'odh-pig-builds/build-config.yaml'
   - name: pnc-profile
