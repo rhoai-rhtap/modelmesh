@@ -77,6 +77,34 @@ spec:
       - name: workspace
         workspace: workspace
     params:
+    - name: build-config-git-url
+      description: Source Repository URL containing the build configuration
+      type: string
+    - name: build-config-revision
+      default: ""
+      description: Revision of the Source Repository containing the build configuration
+      type: string
+    - name: build-config-path
+      default: "build-config.yaml"
+      description: Full path of the build configuration file
+      type: string
+    - description: Source Repository URL containing the PNC CLI configuration
+      name: pnc-cli-config-git-url
+      type: string
+    - default: ""
+      description: Revision of the Source Repository containing the PNC CLI configuration
+      name: pnc-cli-config-revision
+      type: string
+    - description: The profile to be used (declared in the pnc-cli configuration file; possible options are "prod" or "stage")
+      name: pnc-profile
+      type: string
+    - description: The service account name to be used for PNC authentication against corporate SSO
+      name: svc-account-name
+      type: string
+    - description: The service account secret
+      name: svc-account-secret
+      type: string
+      
     - description: Source Repository URL
       name: git-url
       type: string
