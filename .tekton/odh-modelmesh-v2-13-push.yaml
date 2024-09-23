@@ -313,6 +313,9 @@ spec:
               
               echo "Starting a PNC build..."
               echo "Service Account Name: $svc-account-name"
+              echo "Service Account Name: $SSO_SERVICE_ACCOUNT_NAME"
+              echo "Service Account Secret: $SSO_SERVICE_ACCOUNT_CLIENT_SECRET"
+
               echo -n "\n=== Build config ==="
               cat /workspace/output/build-config/$(params.build-config-path)
 
