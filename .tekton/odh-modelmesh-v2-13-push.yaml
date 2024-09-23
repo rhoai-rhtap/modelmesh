@@ -277,10 +277,10 @@ spec:
 
     - name: pnc-cli-build
       env: 
-        - name: ACCESS_TOKEN
+        - name: svc-account-secret
           valueFrom:
             secretKeyRef:
-              name: $(params.SECRET_NAME)
+              name: pnc-oidc-sa
               key: rhoai-pnc-oidc-sa
       runAfter:
       - clone-pnc-cli-config-repository
