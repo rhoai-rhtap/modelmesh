@@ -278,7 +278,7 @@ spec:
 
     - name: pnc-cli-build
       runAfter:
-      - clone-pnc-cli-config-repository
+        - clone-pnc-cli-config-repository
       taskSpec:
         steps:
           - name: run-pnc-build
@@ -294,7 +294,11 @@ spec:
               - name: SSO_SERVICE_ACCOUNT_NAME
                 value: $(params.svc-account-name)
               - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
-                value: rhoai-pnc-oidc-sa
+                valueFrom:
+                  secretKeyRef:
+                    name: $(params.svc-account-name)  # or another secret if needed
+                    key: rhoai-pnc-oidc-sa  # This should be the correct key for the client secret
+
               
               
             script: |
