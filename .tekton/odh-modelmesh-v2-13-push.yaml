@@ -38,6 +38,8 @@ spec:
     value: 'https://gitlab.cee.redhat.com/project-ncl/utils.git'
   - name: pnc-cli-config-revision
     value: 'master'
+  - name: pnc-profile
+    value: 'prod'
   pipelineSpec:
     finally:
     - name: show-sbom
@@ -94,6 +96,8 @@ spec:
       description: Revision of the Source Repository containing the PNC CLI configuration
       name: pnc-cli-config-revision
       type: string
+    - name: pnc-profile
+      value: 'prod'
       
     - description: Source Repository URL
       name: git-url
