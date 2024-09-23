@@ -103,9 +103,9 @@ spec:
     - description: The service account name to be used for PNC authentication against corporate SSO
       name: svc-account-name
       type: string
-    - description: The service account secret
-      name: svc-account-secret
-      type: string
+    #- description: The service account secret
+      #name: svc-account-secret
+      #type: string
       
     - description: Source Repository URL
       name: git-url
