@@ -285,7 +285,7 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: $(params.svc-account-name)
-                    key: $(params.svc-account-secret)
+                    key: rhoai-pnc-oidc-sa
             script: |
               #!/bin/bash
               set -e
