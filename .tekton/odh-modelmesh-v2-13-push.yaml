@@ -38,7 +38,7 @@ spec:
   - name: svc-account-name
     value: 'pnc-oidc-sa'  
   - name: svc-account-secret
-    value: 'pnc-oidc-sa'
+    value: 'rhoai-pnc-oidc-sa'
   - name: pnc-cli-config-git-url
     value: 'https://gitlab.cee.redhat.com/project-ncl/utils.git'
   - name: pnc-cli-config-revision
@@ -276,6 +276,12 @@ spec:
         workspace: git-auth
 
     - name: pnc-cli-build
+      env: 
+        - name: ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: $(params.SECRET_NAME)
+              key: rhoai-pnc-oidc-sa
       runAfter:
       - clone-pnc-cli-config-repository
       taskSpec:
