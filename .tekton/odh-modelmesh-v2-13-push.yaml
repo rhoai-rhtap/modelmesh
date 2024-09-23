@@ -291,14 +291,13 @@ spec:
                   secretKeyRef:
                     name: $(params.svc-account-name)
                     key: rhoai-pnc-oidc-sa
-              - name: SSO_SERVICE_ACCOUNT_NAME
-                value: $(params.svc-account-name)
-              - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
-                valueFrom:
-                  secretKeyRef:
-                    name: $(params.svc-account-name)  # or another secret if needed
-                    key: rhoai-pnc-oidc-sa  # This should be the correct key for the client secret
-
+              #- name: SSO_SERVICE_ACCOUNT_NAME
+                #value: $(params.svc-account-name)
+              #- name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
+                #valueFrom:
+                  #secretKeyRef:
+                    #name: $(params.svc-account-name)  
+                    #key: rhoai-pnc-oidc-sa
               
               
             script: |
@@ -311,7 +310,7 @@ spec:
               cat /workspace/output/build-config/$(params.build-config-path)
 
               cp /workspace/output/build-config/$(params.build-config-path) /workspace/output
-              envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /workspace/output/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/output/config.yaml
+              envsubst '${svc-account-name} ${svc-account-secret}' < /workspace/output/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/output/config.yaml
 
               java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile $(params.pnc-profile) --jsonOutput
       workspaces:
