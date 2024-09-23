@@ -306,6 +306,7 @@ spec:
               set -x
               
               echo "Starting a PNC build..."
+              echo "Service Account Name: $svc-account-name"
               echo -n "\n=== Build config ==="
               cat /workspace/output/build-config/$(params.build-config-path)
 
