@@ -38,6 +38,8 @@ spec:
     value: 'prod'
   - name: svc-account-name
     value: 'pnc-oidc-sa'
+  - name: svc-account-secret
+    value: 'rhoai-pnc-oidc-sa'
   - name: pnc-cli-config-git-url
     value: 'https://gitlab.cee.redhat.com/project-ncl/utils.git'
   - name: pnc-cli-config-revision
@@ -104,9 +106,9 @@ spec:
     - description: The service account name to be used for PNC authentication against corporate SSO
       name: svc-account-name
       type: string
-    #- description: The service account secret
-      #name: svc-account-secret
-      #type: string
+    - description: The service account secret
+      name: svc-account-secret
+      type: string
       
     - description: Source Repository URL
       name: git-url
@@ -283,10 +285,17 @@ spec:
             image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:64de07fb16f9a31799f1e020df9f4fc1015212dc
             env:
               - name: svc-account-name
+                value: $(params.svc-account-name)
+              - name: svc-account-secret
                 valueFrom:
                   secretKeyRef:
                     name: $(params.svc-account-name)
                     key: rhoai-pnc-oidc-sa
+              - name: SSO_SERVICE_ACCOUNT_NAME
+                value: $(params.svc-account-name)
+              - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
+                value: $(params.svc-account-secret)
+              
               
             script: |
               #!/bin/bash
