@@ -34,12 +34,6 @@ spec:
     value: 'rhoai-2.13'
   - name: build-config-path
     value: 'odh-pig-builds/build-config.yaml'
-  - name: pnc-profile
-    value: 'prod'
-  - name: svc-account-name
-    value: 'rhoai-pnc-oidc-sa'
-  - name: svc-account-secret
-    value: 'pnc-secret'
   - name: pnc-cli-config-git-url
     value: 'https://gitlab.cee.redhat.com/project-ncl/utils.git'
   - name: pnc-cli-config-revision
@@ -100,17 +94,6 @@ spec:
       description: Revision of the Source Repository containing the PNC CLI configuration
       name: pnc-cli-config-revision
       type: string
-    - description: The profile to be used (declared in the pnc-cli configuration file; possible options are "prod" or "stage")
-      name: pnc-profile
-      type: string
-    - description: The service account name to be used for PNC authentication against corporate SSO
-      name: svc-account-name
-      type: string
-      default: "rhoai-pnc-oidc-sa"
-    - description: The service account secret
-      name: svc-account-secret
-      type: string
-      default: "pnc-secret"
       
     - description: Source Repository URL
       name: git-url
@@ -287,9 +270,21 @@ spec:
             image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:64de07fb16f9a31799f1e020df9f4fc1015212dc
             env:
               - name: SSO_SERVICE_ACCOUNT_NAME
-                value: $(params.svc-account-name)
+                valueFrom:
+                  secretKeyRef:
+                    name: pnc-secret
+                    key: svc.account.username    
               - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
-                value: $(params.svc-account-secret)
+                valueFrom:
+                  secretKeyRef:
+                    name: pnc-secret            
+                    key: svc.account.password      
+              - name: PNC_PROFILE
+                valueFrom:
+                  secretKeyRef:
+                    name: pnc-secret               
+                    key: pnc.profile               
+
               #- name: svc-account-name
                 #value: $(params.svc-account-name)
               #- name: svc-account-secret
