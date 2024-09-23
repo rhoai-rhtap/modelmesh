@@ -36,7 +36,7 @@ spec:
   - name: pnc-profile
     value: 'prod'
   - name: svc-account-secret
-    value: "$(params.svc-account-secret)
+    value: "$(params.svc-account-secret)"
   - name: pnc-cli-config-git-url
     value: 'https://gitlab.cee.redhat.com/project-ncl/utils.git'
   - name: pnc-cli-config-revision
