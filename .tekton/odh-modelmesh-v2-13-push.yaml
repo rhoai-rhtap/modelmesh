@@ -286,6 +286,10 @@ spec:
                   secretKeyRef:
                     name: $(params.svc-account-name)
                     key: rhoai-pnc-oidc-sa
+              - name: SSO_SERVICE_ACCOUNT_NAME
+                value: $(params.svc-account-name)
+              - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
+                value: $(params.svc-account-secret)
             script: |
               #!/bin/bash
               set -e
