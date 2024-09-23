@@ -281,10 +281,10 @@ spec:
           - name: run-pnc-build
             image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:64de07fb16f9a31799f1e020df9f4fc1015212dc
             env:
-              - name: svc-account-secret
+              - name: svc-account-name
                 valueFrom:
                   secretKeyRef:
-                    name: $(params.svc-account-name)  # Use svc-account-name here
+                    name: $(params.svc-account-name)
                     key: $(params.svc-account-secret)
             script: |
               #!/bin/bash
