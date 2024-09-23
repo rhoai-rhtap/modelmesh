@@ -311,7 +311,9 @@ spec:
 
               cp /workspace/output/build-config/$(params.build-config-path) /workspace/output
               envsubst '${svc-account-name} ${svc-account-secret}' < /workspace/output/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/output/config.yaml
-
+              
+              echo "Service Account Name: $svc-account-name"
+              
               java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile $(params.pnc-profile) --jsonOutput
       workspaces:
       - name: output
