@@ -36,9 +36,7 @@ spec:
   - name: pnc-profile
     value: 'prod'
   - name: svc-account-name
-    value: 'pnc-oidc-sa'  
-  - name: svc-account-secret
-    value: rhoai-pnc-oidc-sa
+    value: 'pnc-oidc-sa'
   - name: pnc-cli-config-git-url
     value: 'https://gitlab.cee.redhat.com/project-ncl/utils.git'
   - name: pnc-cli-config-revision
