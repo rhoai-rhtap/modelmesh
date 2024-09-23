@@ -280,8 +280,8 @@ spec:
         - name: svc-account-secret
           valueFrom:
             secretKeyRef:
-              name: pnc-oidc-sa
-              key: rhoai-pnc-oidc-sa
+              name:  $(params.svc-account-name)
+              key: $(params.svc-account-secret)
       runAfter:
       - clone-pnc-cli-config-repository
       taskSpec:
