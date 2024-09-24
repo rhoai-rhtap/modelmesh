@@ -318,9 +318,6 @@ spec:
               cp /workspace/output/build-config/$(params.build-config-path) /workspace/output
               envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /workspace/output/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/output/config.yaml
               
-              echo "Service Account Name: $SSO_SERVICE_ACCOUNT_NAME"
-              echo "Service Account Secret: $SSO_SERVICE_ACCOUNT_CLIENT_SECRET"
-              
               java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile ${PNC_PROFILE} --jsonOutput
       workspaces:
       - name: output
