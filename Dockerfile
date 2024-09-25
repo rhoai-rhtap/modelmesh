@@ -33,18 +33,8 @@ RUN sed -i 's:security.provider.12=SunPKCS11:#security.provider.12=SunPKCS11:g' 
 ENV JAVA_HOME=/usr/lib/jvm/jre-17-openjdk
 
 
-RUN --mount=type=cache,target=/root/.cache/microdnf:rw \
-    microdnf --setopt=cachedir=/root/.cache/microdnf --nodocs install \
-       java-17-openjdk-headless \
-       nss \
-    && microdnf update --nodocs \
-    && sed -i 's:security.provider.12=SunPKCS11:#security.provider.12=SunPKCS11:g' /usr/lib/jvm/java-17-openjdk-*/conf/security/java.security \
-    && sed -i 's:#security.provider.1=SunPKCS11 ${java.home}/lib/security/nss.cfg:security.provider.12=SunPKCS11 ${java.home}/lib/security/nss.cfg:g' /usr/lib/jvm/java-17-openjdk-*/conf/security/java.security \
-    && java -version \
-    && true
-
 COPY --from=stage /build/target/dockerhome/ /opt/kserve/mmesh/
-COPY version /etc/modelmesh-version
+
 # Make this the current directory when starting the container
 WORKDIR /opt/kserve/mmesh
 
