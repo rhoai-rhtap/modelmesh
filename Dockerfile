@@ -2,18 +2,16 @@
 ARG SOURCE_CODE=.
 ARG CI_CONTAINER_VERSION="unknown"
 
-## CPaaS CODE BEGIN ##
+
 FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
-## CPaaS CODE END ##
 
 
-## CPaaS CODE BEGIN ##
 ENV STAGE_DIR="/tmp/artifacts"
 COPY artifacts/modelmesh_artifacts.zip ${STAGE_DIR}/
 # Install packages for the install script and extract archives
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip
 RUN unzip ${STAGE_DIR}/modelmesh_artifacts.zip -d /root/
-## CPaaS CODE END ##
+
 
 ###############################################################################
 FROM registry.redhat.io/ubi8/openjdk-17-runtime:latest as runtime
