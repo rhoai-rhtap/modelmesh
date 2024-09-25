@@ -34,7 +34,7 @@ RUN sed -i 's:security.provider.12=SunPKCS11:#security.provider.12=SunPKCS11:g' 
 ENV JAVA_HOME=/usr/lib/jvm/jre-17-openjdk
 
 
-COPY --from=stage root/target/dockerhome/ /opt/kserve/mmesh/
+COPY registry.redhat.io/ubi8/ubi-minimal:latest root/target/dockerhome/ /opt/kserve/mmesh/
 
 
 # Make this the current directory when starting the container
