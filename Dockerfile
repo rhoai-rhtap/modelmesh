@@ -5,13 +5,6 @@ ARG CI_CONTAINER_VERSION="unknown"
 
 FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
-ENV STAGE_DIR="/tmp/artifacts"
-COPY artifacts/modelmesh_artifacts.zip ${STAGE_DIR}/
-# Install packages for the install script and extract archives
-RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip
-RUN unzip ${STAGE_DIR}/modelmesh_artifacts.zip -d /root/
-
-
 ###############################################################################
 FROM registry.redhat.io/ubi8/openjdk-17-runtime:latest as runtime
 
@@ -36,13 +29,22 @@ USER root
 RUN sed -i 's:security.provider.12=SunPKCS11:#security.provider.12=SunPKCS11:g' /usr/lib/jvm/java-17-openjdk-*/conf/security/java.security \
     && sed -i 's:#security.provider.1=SunPKCS11 ${java.home}/lib/security/nss.cfg:security.provider.12=SunPKCS11 ${java.home}/lib/security/nss.cfg:g' /usr/lib/jvm/java-17-openjdk-*/conf/security/java.security
 
+
 ENV JAVA_HOME=/usr/lib/jvm/jre-17-openjdk
 
 
-## CPaaS CODE BEGIN ##
-COPY --from=stage root/target/dockerhome/ /opt/kserve/mmesh/
-## CPaaS CODE END ##
+RUN --mount=type=cache,target=/root/.cache/microdnf:rw \
+    microdnf --setopt=cachedir=/root/.cache/microdnf --nodocs install \
+       java-17-openjdk-headless \
+       nss \
+    && microdnf update --nodocs \
+    && sed -i 's:security.provider.12=SunPKCS11:#security.provider.12=SunPKCS11:g' /usr/lib/jvm/java-17-openjdk-*/conf/security/java.security \
+    && sed -i 's:#security.provider.1=SunPKCS11 ${java.home}/lib/security/nss.cfg:security.provider.12=SunPKCS11 ${java.home}/lib/security/nss.cfg:g' /usr/lib/jvm/java-17-openjdk-*/conf/security/java.security \
+    && java -version \
+    && true
 
+COPY --from=stage /build/target/dockerhome/ /opt/kserve/mmesh/
+COPY version /etc/modelmesh-version
 # Make this the current directory when starting the container
 WORKDIR /opt/kserve/mmesh
 
