@@ -3,3 +3,5 @@ contentOrigin:
     - ubi.repo
 packages:
   - jq
+  - wget
+  - unzip
