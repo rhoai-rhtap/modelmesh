@@ -319,7 +319,7 @@ spec:
               if ! command -v jq &> /dev/null; then
                   echo "jq could not be found, installing..."
                   microdnf install -y jq || apt-get install -y jq
-        fi
+              fi
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
               
               cat  $(results.pnc-file-list.path)
