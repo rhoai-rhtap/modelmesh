@@ -316,6 +316,10 @@ spec:
               echo -e "===================="
 
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
+              if ! command -v jq &> /dev/null; then
+                  echo "jq could not be found, installing..."
+                  microdnf install -y jq || apt-get install -y jq
+        fi
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
               
               cat  $(results.pnc-file-list.path)
