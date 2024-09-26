@@ -1,0 +1,22 @@
+---
+lockfileVersion: 1
+lockfileVendor: redhat
+arches:
+- arch: x86_64
+  packages:
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/x86_64/appstream/os/Packages/j/jq-1.6-9.el8_10.x86_64.rpm
+    repoid: ubi-8-appstream-rpms
+    size: 207896
+    checksum: sha256:baaa3660d87c4f3c12776e051b7f13835fee8918389a57673519e3389eb7aa3b
+    name: jq
+    evr: 1.6-9.el8_10
+    sourcerpm: jq-1.6-9.el8_10.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi8/8/x86_64/appstream/os/Packages/o/oniguruma-6.8.2-3.el8.x86_64.rpm
+    repoid: ubi-8-appstream-rpms
+    size: 192632
+    checksum: sha256:1c5c91d8a33987892ec7320c08311a31245be91800aa5879e20d137971bd053f
+    name: oniguruma
+    evr: 6.8.2-3.el8
+    sourcerpm: oniguruma-6.8.2-3.el8.src.rpm
+  source: []
+  module_metadata: []

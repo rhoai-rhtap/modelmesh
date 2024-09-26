@@ -2,7 +2,7 @@
 ARG SOURCE_CODE=.
 ARG CI_CONTAINER_VERSION="unknown"
 
-FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
+FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
 # Define a build argument for the PNC list of built files
 ARG PNC_FILES_JSON
@@ -22,7 +22,7 @@ RUN echo "$PNC_FILES_JSON" | jq -r '.[] | select(test("\\.zip$"))' | \
 
 
 ###############################################################################
-FROM registry.redhat.io/ubi8/openjdk-17-runtime:latest as runtime
+FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
 
 ## Build args to be used at this step
 ARG CI_CONTAINER_VERSION
