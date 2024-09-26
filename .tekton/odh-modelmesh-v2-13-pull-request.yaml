@@ -30,6 +30,8 @@ spec:
     value: Dockerfile
   - name: path-context
     value: .
+  - name: prefetch-input
+    value: rpm
   pipelineSpec:
     finally:
     - name: show-sbom
@@ -186,6 +188,8 @@ spec:
       params:
       - name: input
         value: $(params.prefetch-input)
+      - name: dev-package-managers
+        value: "true"
       runAfter:
       - clone-repository
       taskRef:
