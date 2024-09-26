@@ -9,6 +9,7 @@ ARG PNC_FILES_JSON
 RUN echo "Files to download: $PNC_FILES_JSON"
 
 # Install packages for the install script and extract archives
+RUN microdnf install -y jq
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 ENV STAGE_DIR="/tmp/artifacts"
