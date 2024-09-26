@@ -30,6 +30,8 @@ spec:
     value: Dockerfile
   - name: path-context
     value: .
+  - name: prefetch-input
+    value: rpm
   - name: build-config-git-url
     value: 'https://github.com/rhoai-rhtap/RHOAI-Build-Config.git'
   - name: build-config-revision
@@ -327,6 +329,8 @@ spec:
       params:
       - name: input
         value: $(params.prefetch-input)
+      - name: dev-package-managers
+        value: "true"
       runAfter:
       - pnc-cli-build
       taskRef:
