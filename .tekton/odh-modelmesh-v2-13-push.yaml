@@ -359,12 +359,6 @@ spec:
               echo -e "\nContents of the PNC results:"
               cat "$(results.pnc-file-list.path)"
 
-
-              
-            
-
-              
-              
       workspaces:
       - name: output
         workspace: workspace
