@@ -13,16 +13,16 @@ RUN microdnf install -y jq
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 #ENV STAGE_DIR="/tmp/artifacts"
-WORKDIR workspace
+WORKDIR /workspace
+
+RUN ls -l /workspace && \
+    echo "Changing directory to /workspace/pnc" && \
+    cd /workspace/pnc && \
+    echo "Successfully changed to /workspace/pnc"
 
 RUN echo "Listing contents of /workspace" && \ 
           ls -l /workspace && \ 
-    echo "Listing contents of /workspace/pnc" && \ 
-          ls -l /workspace/pnc && \ cd /workspace/pnc
-
-RUN echo "Listing contents of /workspace/pnc" && \ 
-          ls -l /workspace/pnc
-
+    
 #WORKDIR /workspace RUN echo "Listing contents of /workspace/pnc" && \ ls -l /workspace/pnc && \ cd /workspace/pnc
     
     
