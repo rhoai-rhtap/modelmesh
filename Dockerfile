@@ -16,7 +16,7 @@ ENV STAGE_DIR="/tmp/artifacts"
 WORKDIR $STAGE_DIR
 
 RUN echo "Listing contents of /workspace/pnc..." && \
-    ls -l /workspace/pnc .. pnc
+    ls -l /workspace/pnc ../pnc
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
