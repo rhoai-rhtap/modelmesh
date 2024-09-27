@@ -16,12 +16,12 @@ ENV STAGE_DIR="/tmp/artifacts"
 WORKDIR $STAGE_DIR
 
 # Verify if there are zip files in the updated workspace and unzip them
-RUN echo "Checking for zip files in /workspace/output/..." && \
-    ls /workspace/output/ && \
-    if [ -n "$(ls /workspace/output/*.zip 2>/dev/null)" ]; then \
-        unzip -o "/workspace/output/*.zip" -d "/root/"; \
+RUN echo "Checking for zip files in /workspace/pnc..." && \
+    ls /workspace/pnc && \
+    if [ -n "$(ls /workspace/pnc/*.zip 2>/dev/null)" ]; then \
+        unzip -o "/workspace/pnc/*.zip" -d "/root/"; \
     else \
-        echo "No zip files found in /workspace/output/"; \
+        echo "No zip files found in /workspace/pnc"; \
     fi
 
 
