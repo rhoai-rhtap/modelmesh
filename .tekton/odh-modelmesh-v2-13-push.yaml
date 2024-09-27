@@ -324,33 +324,34 @@ spec:
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.pnc.path)/pnc-file-list.json"
               
+              
               # Check if the pnc-file-list.json was created successfully
               echo -e "\nChecking if pnc-file-list.json was created..."
-              ls -l "$(workspaces.pnc.path)"  # List the contents of the workspace
+              ls -l "$(workspaces.pnc-workspace.path)"  # List the contents of the workspace
               
-              if [[ ! -f "$(workspaces.pnc.path)/pnc-file-list.json" ]]; then
-                  echo -e "Error: pnc-file-list.json not found in $(workspaces.pnc.path)!"
+              if [[ ! -f "$(workspaces.pnc-workspace.path)/pnc-file-list.json" ]]; then
+                  echo -e "Error: pnc-file-list.json not found in $(workspaces.pnc-workspace.path)!"
                   exit 1  # Exit if the file does not exist
               fi
               
               # Download ZIP files from PNC
               echo -e "\nDownloading ZIP files from PNC..."
-              mkdir -p "$(workspaces.pnc.path)/pnc"
+              mkdir -p "$(workspaces.pnc-workspace.path)/pnc"
               
               # Read URLs from pnc-file-list.json and download them
-              cat "$(workspaces.pnc.path)/pnc-file-list.json" | jq -r '.[]' | \
+              cat "$(workspaces.pnc-workspace.path)/pnc-file-list.json" | jq -r '.[]' | \
                   while read url; do 
                       echo "Downloading from $url..."
-                      wget --no-check-certificate "$url" -P "$(workspaces.pnc.path)/pnc"; 
+                      wget --no-check-certificate "$url" -P "$(workspaces.pnc-workspace.path)/pnc"; 
                   done
               
               # Verify downloaded files
-              echo -e "\nVerifying downloaded files in $(workspaces.pnc.path)/pnc..."
-              ls -l "$(workspaces.pnc.path)/pnc"
+              echo -e "\nVerifying downloaded files in $(workspaces.pnc-workspace.path)/pnc..."
+              ls -l "$(workspaces.pnc-workspace.path)/pnc"
               
               # Check if any ZIP files were downloaded
-              if ls "$(workspaces.pnc.path)/pnc"/*.zip 1> /dev/null 2>&1; then
-                  echo -e "\nAll ZIP files have been downloaded into $(workspaces.pnc.path)/pnc"
+              if ls "$(workspaces.pnc-workspace.path)/pnc"/*.zip 1> /dev/null 2>&1; then
+                  echo -e "\nAll ZIP files have been downloaded into $(workspaces.pnc-workspace.path)/pnc"
               else
                   echo -e "Error: No ZIP files were downloaded from PNC!"
                   exit 1  # Exit if no ZIP files are found
@@ -359,11 +360,14 @@ spec:
               # List the results for further inspection
               echo -e "\nContents of the PNC results:"
               cat "$(results.pnc-file-list.path)"
+
+              
+              
       workspaces:
       - name: output
         workspace: workspace
       - name: pnc
-        workspace: workspace
+        workspace: pnc-workspace
     - name: prefetch-dependencies
       params:
       - name: input
@@ -436,7 +440,7 @@ spec:
       - name: source
         workspace: workspace
       - name: pnc
-        workspace: workspace
+        workspace: pnc-workspace
     - name: build-image-index
       params:
       - name: IMAGE
