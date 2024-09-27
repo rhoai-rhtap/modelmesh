@@ -320,16 +320,40 @@ spec:
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
 
+              echo -e "\nChecking for pnc-file-list.json..."
+     
+              if [[ ! -f "$(workspaces.pnc.path)/pnc-file-list.json" ]]; then
+                  echo -e "Error: pnc-file-list.json not found in $(workspaces.pnc.path)!"
+                  exit 1  
+              fi
+              
+              
               echo -e "\nDownloading ZIP files from PNC..."
               mkdir -p "$(workspaces.pnc.path)/pnc"
               
+             
               cat "$(workspaces.pnc.path)/pnc-file-list.json" | jq -r '.[]' | \
-                  while read url; do wget --no-check-certificate "$url" -P "$(workspaces.pnc.path)/pnc"; done
+                  while read url; do 
+                      echo "Downloading from $url..."
+                      wget --no-check-certificate "$url" -P "$(workspaces.pnc.path)/pnc"; 
+                  done
               
               
-              echo -e "\nAll ZIP files have been downloaded and unzipped in /workspace/pnc"
+              echo -e "\nVerifying downloaded files in /workspace/pnc..."
+              ls -l "$(workspaces.pnc.path)/pnc"
               
-              cat  $(results.pnc-file-list.path)
+              
+              if ls "$(workspaces.pnc.path)/pnc"/*.zip 1> /dev/null 2>&1; then
+                  echo -e "\nAll ZIP files have been downloaded into /workspace/pnc"
+              else
+                  echo -e "Error: No ZIP files were downloaded from PNC!"
+                  exit 1  
+              fi
+              
+             
+              echo -e "\nContents of the PNC results:"
+              cat "$(results.pnc-file-list.path)"
+
 
       workspaces:
       - name: output
