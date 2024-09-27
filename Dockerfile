@@ -17,7 +17,7 @@ WORKDIR workspace
 
 RUN echo "Listing contents of /workspace/pnc" && \
     ls -l .. \
-    cd /workspace/pnc
+    cd workspace/pnc
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
