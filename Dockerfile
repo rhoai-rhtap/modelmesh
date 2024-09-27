@@ -13,11 +13,12 @@ RUN microdnf install -y jq
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 #ENV STAGE_DIR="/tmp/artifacts"
-WORKDIR workspace
+#WORKDIR workspace
 
 RUN echo "Listing contents of /workspace/pnc" && \
-    ls -l .. \
-    cd workspace/pnc
+    ls -l 
+    
+    
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
