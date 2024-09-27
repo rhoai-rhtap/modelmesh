@@ -15,10 +15,8 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 ENV STAGE_DIR="/tmp/artifacts"
 WORKDIR $STAGE_DIR
 
-# Filter the zip files only and unzip them in /root/
-RUN echo "$PNC_FILES_JSON" | jq -r '.[] | select(test("\\.zip$"))' | \
-    while read url; do wget --no-check-certificate "$url"; done && \
-    for file in *.zip; do unzip -d /root/ "$file"; done
+RUN unzip -o "/workspace/pnc/pnc/*.zip" -d "/root/"
+
 
 
 ###############################################################################
