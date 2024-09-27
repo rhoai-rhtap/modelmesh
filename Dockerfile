@@ -16,6 +16,7 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 WORKDIR workspace
 
 RUN echo "Listing contents of /workspace/pnc" && \
+    ls \
     ls -l ../workspace \
     ls-l workspace
 
