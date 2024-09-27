@@ -366,6 +366,8 @@ spec:
       workspaces:
       - name: output
         workspace: workspace
+      - name: workspace
+        workspace: workspace
       - name: pnc
         workspace: pnc-workspace
     - name: prefetch-dependencies
