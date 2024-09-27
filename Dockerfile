@@ -15,12 +15,8 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 ENV STAGE_DIR="/tmp/artifacts"
 WORKDIR $STAGE_DIR
 
-COPY workspace workspace
-
-RUN echo "Listing contents of /workspace..." && \
-    ls -l /workspace && \
-    echo "Listing contents of /workspace/pnc..." && \
-    ls -l /workspace/pnc
+RUN echo "Listing contents of /workspace/pnc..." && \
+    ls -l /workspace/pnc .. pnc
 
 RUN echo "Checking for zip files in /workspace/pnc..." && \
     if [ -n "$(ls /workspace/pnc/*.zip 2>/dev/null)" ]; then \
