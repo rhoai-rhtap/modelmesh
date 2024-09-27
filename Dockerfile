@@ -5,8 +5,8 @@ ARG CI_CONTAINER_VERSION="unknown"
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
 # Define a build argument for the PNC list of built files
-ARG PNC_FILES_JSON
-RUN echo "Files to download: $PNC_FILES_JSON"
+#ARG PNC_FILES_JSON
+#RUN echo "Files to download: $PNC_FILES_JSON"
 
 # Install packages for the install script and extract archives
 RUN microdnf install -y jq
@@ -14,6 +14,8 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 
 ENV STAGE_DIR="/tmp/artifacts"
 WORKDIR $STAGE_DIR
+
+COPY ./workspace /workspace
 
 RUN echo "Listing contents of /workspace..." && \
     ls -l /workspace && \
