@@ -13,12 +13,9 @@ RUN microdnf install -y jq
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 #ENV STAGE_DIR="/tmp/artifacts"
-#WORKDIR workspace
+WORKDIR workspace
 
-RUN ls -l /workspace/pnc/../pnc
-RUN ls -l ../pnc
-
-
+RUN ls -l /workspace
 
 
 ###############################################################################
