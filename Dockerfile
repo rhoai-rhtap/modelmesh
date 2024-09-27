@@ -12,8 +12,8 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 RUN microdnf install -y jq
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
-ENV STAGE_DIR="/tmp/artifacts"
-WORKDIR $STAGE_DIR
+#ENV STAGE_DIR="/tmp/artifacts"
+WORKDIR workspace
 
 RUN echo "Listing contents of /workspace/pnc..." && \
     ls -l /workspace/pnc/../pnc \ 
