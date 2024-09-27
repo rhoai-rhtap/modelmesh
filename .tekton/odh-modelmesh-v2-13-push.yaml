@@ -323,35 +323,35 @@ spec:
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
 
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
-              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.pnc.path)/pnc-file-list.json"
+              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.workspace.path)/pnc-file-list.json"
               
               # Check if the pnc-file-list.json was created successfully
               echo -e "\nChecking if pnc-file-list.json was created..."
-              ls -l "$(workspaces.pnc.path)"  # List the contents of the workspace
+              ls -l "$(workspaces.workspace.path)"  # List the contents of the workspace
               
-              if [[ ! -f "$(workspaces.pnc.path)/pnc-file-list.json" ]]; then
-                  echo -e "Error: pnc-file-list.json not found in $(workspaces.pnc.path)!"
+              if [[ ! -f "$(workspaces.workspace.path)/pnc-file-list.json" ]]; then
+                  echo -e "Error: pnc-file-list.json not found in $(workspaces.workspace.path)!"
                   exit 1  # Exit if the file does not exist
               fi
               
               # Download ZIP files from PNC
               echo -e "\nDownloading ZIP files from PNC..."
-              mkdir -p "$(workspaces.pnc.path)/pnc"
+              mkdir -p "$(workspaces.workspace.path)/pnc"
               
               # Read URLs from pnc-file-list.json and download them
-              cat "$(workspaces.pnc.path)/pnc-file-list.json" | jq -r '.[]' | \
-                  while read url; do 
+              cat "$(workspaces.workspace.path)/pnc-file-list.json" | jq -r '.[]' | \
+                  while read -r url; do 
                       echo "Downloading from $url..."
-                      wget --no-check-certificate "$url" -P "$(workspaces.pnc.path)/pnc"; 
+                      wget --no-check-certificate "$url" -P "$(workspaces.workspace.path)/pnc"; 
                   done
               
               # Verify downloaded files
-              echo -e "\nVerifying downloaded files in $(workspaces.pnc.path)/pnc..."
-              ls -l "$(workspaces.pnc.path)/pnc"
+              echo -e "\nVerifying downloaded files in $(workspaces.workspace.path)/pnc..."
+              ls -l "$(workspaces.workspace.path)/pnc"
               
               # Check if any ZIP files were downloaded
-              if ls "$(workspaces.pnc.path)/pnc"/*.zip 1> /dev/null 2>&1; then
-                  echo -e "\nAll ZIP files have been downloaded into $(workspaces.pnc.path)/pnc"
+              if ls "$(workspaces.workspace.path)/pnc"/*.zip 1> /dev/null 2>&1; then
+                  echo -e "\nAll ZIP files have been downloaded into $(workspaces.workspace.path)/pnc"
               else
                   echo -e "Error: No ZIP files were downloaded from PNC!"
                   exit 1  # Exit if no ZIP files are found
@@ -359,12 +359,11 @@ spec:
               
               # List the results for further inspection
               echo -e "\nContents of the PNC results:"
-              cat "$(results.pnc-file-list.path)"
+              cat "$(workspaces.workspace.path)/pnc-file-list.json"
+
 
       workspaces:
       - name: output
-        workspace: workspace
-      - name: pnc
         workspace: workspace
     - name: prefetch-dependencies
       params:
