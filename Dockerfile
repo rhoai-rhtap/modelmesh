@@ -17,9 +17,6 @@ WORKDIR workspace
 
 RUN ls -l /workspace
 
-RUN WORKDIR /workspace 
-RUN echo "Listing contents of /workspace/pnc" && \
-         ls -l /workspace/pnc
     
     
 
