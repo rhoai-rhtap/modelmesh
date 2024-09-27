@@ -15,10 +15,11 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 #ENV STAGE_DIR="/tmp/artifacts"
 #WORKDIR workspace
 
-RUN ls -l /workspace/pnc../pnc
+RUN ls -l /workspace/pnc/../pnc
+RUN ls -l ../pnc
 
-    
-    
+
+
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
