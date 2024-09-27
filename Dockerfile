@@ -15,7 +15,7 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 #ENV STAGE_DIR="/tmp/artifacts"
 WORKDIR workspace
 
-RUN ls -l /workspace
+RUN ls -l /workspace/pnc../pnc
 
     
     
