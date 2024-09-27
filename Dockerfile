@@ -16,10 +16,7 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 WORKDIR workspace
 
 RUN echo "Listing contents of /workspace/pnc..." && \
-    ls -l /workspace/pnc/../pnc \ 
-    ls -l /workspace/pnc ../pnc \
-    ls -l .. \
-    ls -l . \
+    ls -l workspace/pnc/../pnc 
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
