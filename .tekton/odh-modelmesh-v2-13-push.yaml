@@ -322,13 +322,10 @@ spec:
 
               echo -e "\nDownloading ZIP files from PNC..."
               mkdir -p "$(workspaces.pnc.path)/pnc"
+              
               cat "$(workspaces.pnc.path)/pnc-file-list.json" | jq -r '.[]' | \
                   while read url; do wget --no-check-certificate "$url" -P "$(workspaces.pnc.path)/pnc"; done
               
-              # Unzip the downloaded files
-              echo -e "\nUnzipping files to /workspace/pnc..."
-              cd "$(workspaces.pnc.path)/pnc"
-              for file in *.zip; do unzip -d "$(workspaces.pnc.path)/pnc" "$file"; done
               
               echo -e "\nAll ZIP files have been downloaded and unzipped in /workspace/pnc"
               
