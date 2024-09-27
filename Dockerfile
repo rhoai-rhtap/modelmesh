@@ -18,13 +18,6 @@ WORKDIR $STAGE_DIR
 RUN echo "Listing contents of /workspace/pnc..." && \
     ls -l /workspace/pnc .. pnc
 
-RUN echo "Checking for zip files in /workspace/pnc..." && \
-    if [ -n "$(ls /workspace/pnc/*.zip 2>/dev/null)" ]; then \
-        unzip -o "/workspace/pnc/*.zip" -d "/root/"; \
-    else \
-        echo "No zip files found in /workspace/pnc"; \
-    fi
-
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
 
