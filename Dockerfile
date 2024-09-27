@@ -15,6 +15,14 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 ENV STAGE_DIR="/tmp/artifacts"
 WORKDIR $STAGE_DIR
 
+RUN echo "Checking for zip files in /workspace/pnc/pnc/..." && \
+    ls /workspace/pnc/pnc/ && \
+    if [ -n "$(ls /workspace/pnc/pnc/*.zip 2>/dev/null)" ]; then \
+        unzip -o "/workspace/pnc/pnc/*.zip" -d "/root/"; \
+    else \
+        echo "No zip files found in /workspace/pnc/pnc/"; \
+    fi
+
 RUN unzip -o "/workspace/pnc/pnc/*.zip" -d "/root/"
 
 
