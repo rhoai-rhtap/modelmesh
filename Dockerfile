@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 ARG CI_CONTAINER_VERSION="unknown"
-
+#
 FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
 # Set the workspace directory where ZIP files will be copied
