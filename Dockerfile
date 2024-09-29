@@ -10,6 +10,8 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
 RUN ls -l ..
 RUN ls -la ../tmp/cachi2
+RUN ls -l /mnt/trusted-ca/ca-bundle.crt/workspace
+RUN ls -l /workspace/output/source
 RUN ls -la ../mnt
 
 
