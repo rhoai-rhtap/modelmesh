@@ -2,24 +2,25 @@
 ARG SOURCE_CODE=.
 ARG CI_CONTAINER_VERSION="unknown"
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
+# Base image
+FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
 # Define a build argument for the PNC list of built files
 ARG PNC_FILES_JSON
 RUN echo "Files to download: $PNC_FILES_JSON"
 
-# Install packages for the install script and extract archives
-RUN microdnf install -y jq
+# Install packages for downloading and extracting files
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
-ENV DIR="/workspace/pnc"
-WORKDIR $DIR
+# Set the workspace directory where ZIP files will be downloaded
+ENV SOURCE_DIR="/source"
+WORKDIR $SOURCE_DIR
 
-#ENV STAGE_DIR="/tmp/artifacts"
-#WORKDIR $STAGE_DIR
-#WORKDIR workspace
+# Download ZIP files listed in the PNC_FILES_JSON and extract them
+RUN echo "$PNC_FILES_JSON" | jq -r '.[] | select(test("\\.zip$"))' | \
+    while read url; do wget --no-check-certificate "$url"; done && \
+    for file in *.zip; do unzip -d /root/ "$file"; done
 
-RUN ls -l $DIR
 
 
 ###############################################################################
