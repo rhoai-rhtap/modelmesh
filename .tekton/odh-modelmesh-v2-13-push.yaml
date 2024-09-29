@@ -319,7 +319,7 @@ spec:
               cat $PNC_CLI_OUTPUT_FILE
               echo -e "===================="
 
-               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
+              echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
 
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
