@@ -5,8 +5,8 @@ ARG CI_CONTAINER_VERSION="unknown"
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
 # Define a build argument for the PNC list of built files
-#ARG PNC_FILES_JSON
-#RUN echo "Files to download: $PNC_FILES_JSON"
+ARG PNC_FILES_JSON
+RUN echo "Files to download: $PNC_FILES_JSON"
 
 # Install packages for the install script and extract archives
 RUN microdnf install -y jq
