@@ -8,16 +8,14 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 ENV SOURCE_DIR="/workspace/source"
 WORKDIR $SOURCE_DIR
 
-RUN ls -l ..
-
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 # Check if SOURCE_DIR exists and list its contents before copying
 RUN echo "Checking contents of $SOURCE_DIR before copying ZIP files:" && ls -l $SOURCE_DIR || echo "$SOURCE_DIR does not exist"
 
-# Copy all ZIP files from the build context into the container
-COPY /workspace/source/*.zip $SOURCE_DIR/
+# Copy all ZIP files from the source directory in the build context
+COPY source/*.zip $SOURCE_DIR/
 
 # List the contents of SOURCE_DIR after copying
 RUN echo "Contents of $SOURCE_DIR after copying ZIP files:" && ls -l $SOURCE_DIR
@@ -34,7 +32,6 @@ RUN for file in $SOURCE_DIR/*.zip; do \
 
 # List the contents of /root/ after unzipping
 RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
-
 
 
 ###############################################################################
