@@ -7,25 +7,14 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 # Set the workspace directory where ZIP files will be copied
 #ENV SOURCE_DIR="/workspace/source"
 #WORKDIR $SOURCE_DIR
+RUN ls -l /workspace/pnc/../pnc
+RUN ls -l /workspace/pnc ../pnc
 
-RUN ls -l ..
-#RUN ls -l /mnt/trusted-ca/ca-bundle.crt/workspace
-RUN ls -l /workspace/output/source
-RUN ls -la ../mnt
-
-
-WORKDIR workspace
+WORKDIR workspace/pnc
 
 RUN ls -l /workspace
 
-WORKDIR source
-
-RUN ls -l ./source
-
 RUN ls -l ..
-RUN ls -l ../cachi2/cachi2.env
-RUN ls -l ../cachi2/output
-RUN ls -l ../mnt
 
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
