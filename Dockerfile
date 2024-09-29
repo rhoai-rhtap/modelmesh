@@ -11,6 +11,8 @@ WORKDIR $SOURCE_DIR
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
+RUN ls -l ./workspace/source
+
 # Copy all ZIP files from the build context into the container
 COPY ./workspace/source/*.zip $SOURCE_DIR/
 
