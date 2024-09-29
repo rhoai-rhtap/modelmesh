@@ -8,6 +8,9 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 ENV SOURCE_DIR="/workspace/source"
 WORKDIR $SOURCE_DIR
 
+RUN ls -l ..
+RUN ls -l .
+
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
