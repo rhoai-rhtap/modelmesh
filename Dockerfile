@@ -7,6 +7,9 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 # Set the workspace directory where ZIP files will be copied
 #ENV SOURCE_DIR="/workspace/source"
 #WORKDIR $SOURCE_DIR
+WORKDIR workspace
+
+RUN ls -l workspace
 
 RUN ls -l ..
 RUN ls -l ../cachi2/cachi2.env
