@@ -5,10 +5,11 @@ ARG CI_CONTAINER_VERSION="unknown"
 FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
 # Set the workspace directory where ZIP files will be copied
-ENV SOURCE_DIR="/workspace/source"
-WORKDIR $SOURCE_DIR
+#ENV SOURCE_DIR="/workspace/source"
+#WORKDIR $SOURCE_DIR
 
 RUN ls -l ..
+RUN ls -l .
 RUN ls -l ../source
 
 
