@@ -15,7 +15,6 @@ WORKDIR workspace/pnc
 RUN ls -l /workspace
 
 RUN ls -l ..
-#
 
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
