@@ -9,7 +9,7 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 #WORKDIR $SOURCE_DIR
 
 RUN ls -l ..
-RUN ls -la ../tmp
+RUN ls -la ../tmp/cachi2
 RUN ls -la ../mnt
 
 
