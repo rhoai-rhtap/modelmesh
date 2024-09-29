@@ -7,7 +7,7 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 # Set the workspace directory where ZIP files will be copied
 #ENV SOURCE_DIR="/workspace/source"
 #WORKDIR $SOURCE_DIR
-RUN ls -l /workspace/pnc/../pnc
+
 RUN ls -l /workspace/pnc ../pnc
 
 WORKDIR workspace/pnc
