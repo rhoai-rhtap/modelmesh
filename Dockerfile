@@ -2,26 +2,23 @@
 ARG SOURCE_CODE=.
 ARG CI_CONTAINER_VERSION="unknown"
 
-# Base image
 FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
-# Define a build argument for the PNC list of built files
-ARG PNC_FILES_JSON
-RUN echo "Files to download: $PNC_FILES_JSON"
-
-# Install packages for downloading and extracting files
-RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
-
 # Set the workspace directory where ZIP files will be downloaded
-ENV SOURCE_DIR="/source"
+ENV SOURCE_DIR="/workspace/source"
 WORKDIR $SOURCE_DIR
 
-# Download ZIP files listed in the PNC_FILES_JSON and extract them
-RUN echo "$PNC_FILES_JSON" | jq -r '.[] | select(test("\\.zip$"))' | \
-    while read url; do wget --no-check-certificate "$url"; done && \
-    for file in *.zip; do unzip -d /root/ "$file"; done
+# Install required packages
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
+# Copy all ZIP files from /workspace/source into the container
+COPY ${SOURCE_DIR}/*.zip $SOURCE_DIR/
 
+# Unzip all ZIP files into /root/
+RUN for file in $SOURCE_DIR/*.zip; do \
+        echo "Unzipping: $file"; \
+        unzip -d /root/ "$file"; \
+    done
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
