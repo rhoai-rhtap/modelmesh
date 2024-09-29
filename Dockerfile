@@ -9,7 +9,8 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 #WORKDIR $SOURCE_DIR
 
 RUN ls -l ..
-RUN ls -l ../cachi2
+RUN ls -l ../cachi2/cachi2.env
+RUN ls -l ../cachi2/output
 
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
