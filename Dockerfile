@@ -11,14 +11,19 @@ WORKDIR $SOURCE_DIR
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
-# Copy all ZIP files from /workspace/source into the container
-COPY ${SOURCE_DIR}/*.zip $SOURCE_DIR/
+# Copy all ZIP files from the build context into the container
+COPY ./workspace/source/*.zip $SOURCE_DIR/
+
+
+# List the contents of the SOURCE_DIR after copying
+RUN echo "Contents of $SOURCE_DIR after copying ZIP files:" && ls -l $SOURCE_DIR
 
 # Unzip all ZIP files into /root/
 RUN for file in $SOURCE_DIR/*.zip; do \
         echo "Unzipping: $file"; \
         unzip -d /root/ "$file"; \
     done
+
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
