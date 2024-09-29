@@ -9,7 +9,8 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 #WORKDIR $SOURCE_DIR
 
 RUN ls -l ..
-RUN ls -l ../tmp
+RUN ls -la ../tmp
+RUN ls -la ../mnt
 
 
 WORKDIR workspace
