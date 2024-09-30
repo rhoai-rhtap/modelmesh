@@ -344,7 +344,7 @@ spec:
           - description: The file containing the list of pnc built artifacts to be later installed inside the container build
             name: pnc-pom-file
         steps:
-          - name: run-pnc-build
+          - name: run-pnc-download
             image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
             env:
               - name: SSO_SERVICE_ACCOUNT_NAME
@@ -362,52 +362,45 @@ spec:
                   secretKeyRef:
                     name: pnc-secret
                     key: pnc.profile
-              
             script: |
               #!/bin/bash
               set -e
-              # Simulate running the PNC build and generate a fake output file for demonstration
-              PNC_CLI_OUTPUT_FILE="/workspace/output/pnc-cli-run-output.json"
-              echo '{"builds": [{"builtArtifacts": [{"downloadUrl": "http://example.com/artifact1.zip"}, {"downloadUrl": "http://example.com/artifact2.zip"}]}]}' > "$PNC_CLI_OUTPUT_FILE"
-            
-              # Validate the generated JSON
-              echo -e "\nValidating JSON output..."
-              if ! jq . "$PNC_CLI_OUTPUT_FILE"; then
-                  echo "Error: Invalid JSON in $PNC_CLI_OUTPUT_FILE"
+    
+              # Path for the pnc-file-list.json created by the previous task
+              PNC_FILE_LIST_PATH="$(workspaces.source.path)/pnc-file-list.json"
+              ARTIFACTS_DIR="$(workspaces.source.path)/pnc-artifacts"
+    
+              # Ensure the artifacts directory exists
+              mkdir -p "$ARTIFACTS_DIR"
+    
+              echo -e "\n=== Downloading artifacts from PNC ==="
+              if [ -f "$PNC_FILE_LIST_PATH" ]; then
+                  cat "$PNC_FILE_LIST_PATH" | jq -r '.[]' | \
+                  while read -r url; do 
+                      echo "Downloading from $url..."
+                      wget --no-check-certificate "$url" -P "$ARTIFACTS_DIR"; 
+                  done
+              else
+                  echo "Error: PNC file list does not exist at $PNC_FILE_LIST_PATH"
                   exit 1
               fi
-            
-              echo -e "\nGetting the list of built files (to be used later in the container build) ..."
-              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
-            
-              # Check if the pnc-file-list.json was created successfully
-              echo -e "\nChecking if pnc-file-list.json was created..."
-              ls -l "$(workspaces.source.path)"  # List the contents of the workspace
-              cp "$(results.pnc-file-list.path)" "$(workspaces.source.path)/pnc-file-list.json"
-            
-              # Download ZIP files from PNC
-              echo -e "\nDownloading ZIP files from PNC..."
-              cat "$(workspaces.source.path)/pnc-file-list.json" | jq -r '.[]' | \
-              while read -r url; do 
-                  echo "Downloading from $url..."
-                  wget --no-check-certificate "$url" -P "$(workspaces.source.path)/pnc-artifacts"; 
-              done
-            
+    
               # Verify downloaded files
-              echo -e "\nVerifying downloaded files in $(workspaces.source.path)/pnc-artifacts..."
-              ls -l "$(workspaces.source.path)/pnc-artifacts"
-            
+              echo -e "\nVerifying downloaded files in $ARTIFACTS_DIR..."
+              ls -l "$ARTIFACTS_DIR"
+    
               # Check if any ZIP files were downloaded
-              if ls "$(workspaces.source.path)/pnc-artifacts"/*.zip 1> /dev/null 2>&1; then
-                  echo -e "\nAll ZIP files have been downloaded into $(workspaces.source.path)/pnc-artifacts"
+              if ls "$ARTIFACTS_DIR"/*.zip 1> /dev/null 2>&1; then
+                  echo -e "\nAll ZIP files have been downloaded into $ARTIFACTS_DIR"
               else
                   echo -e "Error: No ZIP files were downloaded from PNC!"
                   exit 1  # Exit if no ZIP files are found
               fi
+    
+        workspaces:
+          - name: source
+            workspace: workspace
 
-      workspaces:
-      - name: source
-        workspace: workspace
     - name: prefetch-dependencies
       params:
       - name: input
