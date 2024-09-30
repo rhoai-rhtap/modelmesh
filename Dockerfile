@@ -8,10 +8,10 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 ARG PNC_ZIP_FILES
-RUN echo "Files to download: $PNC_ZIP_FILES"
+ARG PNC_POM_FILES
 
-ARG PNC_POM_FILE
-RUN echo "Files to download: $PNC_POM_FILES"
+RUN echo "ZIP Files to download: $PNC_ZIP_FILES" \
+    && echo "POM Files to download: $PNC_POM_FILES"
 
 RUN ls -l 
 
