@@ -15,12 +15,23 @@ RUN echo "Checking contents of $SOURCE_DIR before copying ZIP files:" && ls -l $
 #WORKDIR $SOURCE_DIR
 
 RUN ls -l ..
-RUN ls -l ..pnc
+#RUN ls -l ..pnc
 
-COPY ../pnc/*.zip $SOURCE_DIR/
+#COPY ../pnc/*.zip $SOURCE_DIR/
 
 # Step 7: List the contents of the directory 
-RUN ls -l $SOURCE_DIR
+#RUN ls -l $SOURCE_DIR
+
+# Unzip all ZIP files into /root/ directory
+RUN for file in /workspace/pnc/*.zip; do \
+        if [ -f "$file" ]; then \
+            echo "Unzipping: $file"; \
+            unzip -d /root/ "$file"; \
+        else \
+            echo "No ZIP files found in /workspace/pnc."; \
+        fi; \
+    done
+
 
 # Unzip all ZIP files into /root/
 RUN for file in $SOURCE_DIR/*.zip; do \
