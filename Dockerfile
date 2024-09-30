@@ -18,7 +18,7 @@ RUN ls -la ../pnc
 RUN echo "Checking the contents of $SOURCE_DIR:" && ls -l $SOURCE_DIR
 
 # Copy ZIP files into the SOURCE_DIR
-COPY pnc/*.zip $SOURCE_DIR/
+COPY ../pnc $SOURCE_DIR/
 
 # Unzip all ZIP files in /workspace/pnc into /root/
 RUN echo "Unzipping files in $SOURCE_DIR..." && \
