@@ -1,9 +1,9 @@
 # Build arguments
 ARG SOURCE_CODE=.
 ARG CI_CONTAINER_VERSION="unknown"
-#
+
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
-#
+
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
