@@ -7,6 +7,9 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
+ARG PNC_ZIP_FILES
+RUN echo "Files to download: $PNC_ZIP_FILES"
+
 RUN ls -l 
 
 # Set the workspace directory where ZIP files will be copied
