@@ -364,12 +364,12 @@ spec:
               echo -e "\nContents of the PNC results:"
               cat "$(results.pnc-file-list.path)"
 
-              cp "/workspace/pnc/$ZIP_FILE_NAME" "$RESULTS_PNC_ZIP_FILE_PATH" && \
-              echo "Copied ZIP file to $RESULTS_PNC_ZIP_FILE_PATH"
-          
-              # Copy POM file to the specified results path
-              cp "/workspace/pnc/$POM_FILE_NAME" "$RESULTS_PNC_POM_FILE_PATH" && \
-                  echo "Copied POM file to $RESULTS_PNC_POM_FILE_PATH"
+              POM_URL=$(echo $PNC_RESULTS | jq -r '. | .[0]')
+              ZIP_URL=$(echo $PNC_RESULTS | jq -r '. | .[1]')
+              
+             
+              cp "$ZIP_URL" "$(results.pnc-zip-file.path)"  
+              cp "$POM_URL" "$(results.pnc-pom-file.path)" 
 
 
 
