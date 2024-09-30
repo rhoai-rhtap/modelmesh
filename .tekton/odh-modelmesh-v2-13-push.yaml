@@ -432,6 +432,8 @@ spec:
       - name: BUILD_ARGS
         value:
         - PNC_FILES_JSON=$(tasks.pnc-cli-build.results.pnc-file-list)
+        - PNC_ZIP_FILES=$(echo "$PNC_FILES_JSON" | jq -r '.[] | select(test("\\.zip$"))')
+        - PNC_POM_FILES=$(echo "$PNC_FILES_JSON" | jq -r '.[] | select(test("\\.pom$"))')
         - $(params.build-args[*])
       - name: BUILD_ARGS_FILE
         value: $(params.build-args-file)
