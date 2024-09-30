@@ -14,7 +14,7 @@ WORKDIR $SOURCE_DIR
 RUN echo "Checking the contents of $SOURCE_DIR:" && ls -l $SOURCE_DIR
 
 RUN ls -la ..
-RUN ls -la ../pnc
+RUN ls -la ../pnc-artifacts
 
 # Unzip all ZIP files in /workspace/pnc into /root/
 RUN echo "Unzipping files in $SOURCE_DIR..." && \
