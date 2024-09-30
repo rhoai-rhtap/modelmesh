@@ -392,8 +392,11 @@ spec:
               cp "$(workspaces.pnc.path)/$POM_FILE" "$(results.pnc-pom-file.path)"
               
               # Confirm the copies
-              echo "Copied ZIP file to $(results.pnc-zip-file.path)"
-              echo "Copied POM file to $(results.pnc-pom-file.path)"
+              #echo "Copied ZIP file to $(results.pnc-zip-file.path)"
+              #echo "Copied POM file to $(results.pnc-pom-file.path)"
+
+              echo "Copied ZIP file to /tekton/results/pnc-zip-file"
+              echo "Copied POM file to /tekton/results/pnc-pom-file"
 
       workspaces:
       - name: output
