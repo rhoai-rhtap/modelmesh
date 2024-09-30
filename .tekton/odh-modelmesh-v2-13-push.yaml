@@ -328,6 +328,10 @@ spec:
 
               cat  $(results.pnc-file-list.path)
 
+              echo -e "\nGetting the list of built files (to be used later in the container build) ..."
+              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.source.path)/pnc-file-list.json"
+              
+
       workspaces:
       - name: output
         workspace: workspace
