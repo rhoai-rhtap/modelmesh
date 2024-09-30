@@ -331,10 +331,6 @@ spec:
       workspaces:
       - name: output
         workspace: workspace
-      #- name: pnc
-       # workspace: workspace
-      - name: source
-        workspace: workspace
         
     - name: download-pnc-files
       runAfter:
@@ -370,6 +366,22 @@ spec:
             script: |
               #!/bin/bash
               set -e
+              echo -e "\nReplacing credentials in the CLI config ..."
+              envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /workspace/output/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/output/config.yaml
+
+              echo -e "\nStarting the PNC build ..."
+              PNC_CLI_OUTPUT_FILE="/workspace/output/pnc-cli-run-output.json"
+              java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile ${PNC_PROFILE} --jsonOutput > $PNC_CLI_OUTPUT_FILE
+
+              echo -e "\nFinished the PNC build!"
+              echo -e "\n=== PNC build output ==="
+              cat $PNC_CLI_OUTPUT_FILE
+              echo -e "===================="
+
+              echo -e "\nGetting the list of built files (to be used later in the container build) ..."
+              jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
+
+              cat  $(results.pnc-file-list.path)
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
 
               # Verify the output file exists
@@ -438,10 +450,6 @@ spec:
 
 
       workspaces:
-      - name: output
-        workspace: workspace
-      #- name: pnc
-       # workspace: workspace
       - name: source
         workspace: workspace
     - name: prefetch-dependencies
