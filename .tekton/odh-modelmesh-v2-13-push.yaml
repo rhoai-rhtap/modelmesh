@@ -326,9 +326,10 @@ spec:
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
 
-              # Create a dedicated directory for PNC artifacts
+              # Create a persistent directory in the workspace for storing artifacts
               mkdir -p "$(workspaces.source.path)/pnc-artifacts"
               
+              # Get the list of built files to be used later in the container build
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.source.path)/pnc-file-list.json"
               
@@ -363,34 +364,17 @@ spec:
                   exit 1  # Exit if no ZIP files are found
               fi
               
-              # List the results for further inspection
-              echo -e "\nContents of the PNC results:"
-              cat "$(results.pnc-file-list.path)"
-              
-              # Verify downloaded files
-              echo -e "\nVerifying downloaded files in $(workspaces.source.path)/pnc-artifacts..."
-              ls -l "$(workspaces.source.path)/pnc-artifacts"
-              
-              # List the results for further inspection
-              echo -e "\nContents of the PNC results:"
-              cat "$(results.pnc-file-list.path)"
-              
-              # Extract the base names of the files from the results
-              POM_URL=$(jq -r '.[0]' "$(results.pnc-file-list.path)")  
-              ZIP_URL=$(jq -r '.[1]' "$(results.pnc-file-list.path)") 
+              # Extract the base names of the files from the pnc-file-list.json
+              POM_URL=$(jq -r '.[0]' "$(workspaces.source.path)/pnc-file-list.json")  
+              ZIP_URL=$(jq -r '.[1]' "$(workspaces.source.path)/pnc-file-list.json") 
               
               # Get the base names of the files
               POM_FILE=$(basename "$POM_URL")
               ZIP_FILE=$(basename "$ZIP_URL")
               
-              # Copy the downloaded ZIP and POM files to the respective result paths
-              cp "$(workspaces.source.path)/pnc-artifacts/$ZIP_FILE" "$(results.pnc-zip-file.path)"
-              cp "$(workspaces.source.path)/pnc-artifacts/$POM_FILE" "$(results.pnc-pom-file.path)"
-              
-              # Confirm the copies
-              echo "Copied ZIP file to /tekton/results/pnc-zip-file"
-              echo "Copied POM file to /tekton/results/pnc-pom-file"
-
+              # Instead of copying to results, keep the files in the workspace
+              echo "Downloaded ZIP file is stored at: $(workspaces.source.path)/pnc-artifacts/$ZIP_FILE"
+              echo "Downloaded POM file is stored at: $(workspaces.source.path)/pnc-artifacts/$POM_FILE"
 
 
       workspaces:
