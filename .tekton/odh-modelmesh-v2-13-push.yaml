@@ -371,13 +371,6 @@ spec:
               echo -e "\nVerifying downloaded files in $(workspaces.source.path)/pnc-artifacts..."
               ls -l "$(workspaces.source.path)/pnc-artifacts"
               
-              # List only the results for further inspection (not the entire contents)
-              echo -e "\nContents of the PNC results (URLs only):"
-              cat "$(results.pnc-file-list.path)" | jq -r '.[]'
-              
-              # Assuming PNC_RESULTS contains the JSON output
-              PNC_RESULTS=$(cat "$(results.pnc-file-list.path)")
-              
               # List the results for further inspection
               echo -e "\nContents of the PNC results:"
               cat "$(results.pnc-file-list.path)"
