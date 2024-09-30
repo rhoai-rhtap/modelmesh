@@ -365,10 +365,11 @@ spec:
             script: |
               #!/bin/bash
               set -e
-    
-              # Path for the pnc-file-list.json created by the previous task
-              PNC_FILE_LIST_PATH="$(workspaces.source.path)/pnc-file-list.json"
-              ARTIFACTS_DIR="$(workspaces.source.path)/pnc-artifacts"
+
+              # Use the correct path for the pnc-file-list.json created by the previous task
+              PNC_FILE_LIST_PATH="$(workspaces.output.path)/pnc-file-list.json"  # Changed to output
+              ARTIFACTS_DIR="$(workspaces.output.path)/pnc-artifacts"
+
     
               # Ensure the artifacts directory exists
               mkdir -p "$ARTIFACTS_DIR"
