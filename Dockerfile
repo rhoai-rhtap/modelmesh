@@ -4,29 +4,22 @@ ARG CI_CONTAINER_VERSION="unknown"
 
 FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
-# Set the workspace directory where ZIP files will be copied
-ENV SOURCE_DIR="/workspace/pnc"
-WORKDIR $SOURCE_DIR
-
-RUN ls -l ..
-
-COPY source/*.zip $SOURCE_DIR/
-
-# Step 7: List the contents of the directory 
-RUN ls -l $SOURCE_DIR
-
-
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 # Check if SOURCE_DIR exists and list its contents before copying
 RUN echo "Checking contents of $SOURCE_DIR before copying ZIP files:" && ls -l $SOURCE_DIR || echo "$SOURCE_DIR does not exist"
 
-# Copy all ZIP files from the source directory in the build context
-COPY source/*.zip $SOURCE_DIR/
+# Set the workspace directory where ZIP files will be copied
+ENV SOURCE_DIR="/workspace/pnc"
+WORKDIR $SOURCE_DIR
 
-# List the contents of SOURCE_DIR after copying
-RUN echo "Contents of $SOURCE_DIR after copying ZIP files:" && ls -l $SOURCE_DIR
+RUN ls -l ..
+
+COPY pnc/*.zip $SOURCE_DIR/
+
+# Step 7: List the contents of the directory 
+RUN ls -l $SOURCE_DIR
 
 # Unzip all ZIP files into /root/
 RUN for file in $SOURCE_DIR/*.zip; do \
