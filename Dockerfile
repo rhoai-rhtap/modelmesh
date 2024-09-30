@@ -11,6 +11,9 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 ENV SOURCE_DIR="/workspace/pnc"
 WORKDIR $SOURCE_DIR
 
+RUN ls -la ..
+RUN ls -la ../pnc
+
 # Check if SOURCE_DIR exists and list its contents
 RUN echo "Checking the contents of $SOURCE_DIR:" && ls -l $SOURCE_DIR
 
