@@ -10,6 +10,9 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 ARG PNC_ZIP_FILES
 RUN echo "Files to download: $PNC_ZIP_FILES"
 
+ARG PNC_POM_FILE
+RUN echo "Files to download: $PNC_POM_FILES"
+
 RUN ls -l 
 
 # Set the workspace directory where ZIP files will be copied
