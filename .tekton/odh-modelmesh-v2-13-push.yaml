@@ -326,6 +326,9 @@ spec:
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
 
+              # Create a dedicated directory for PNC artifacts
+              mkdir -p "$(workspaces.source.path)/pnc-artifacts"
+              
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.source.path)/pnc-file-list.json"
               
@@ -341,20 +344,20 @@ spec:
               # Download ZIP files from PNC
               echo -e "\nDownloading ZIP files from PNC..."
               
-              # Read URLs from pnc-file-list.json and download them directly to the workspace
+              # Read URLs from pnc-file-list.json and download them directly to the dedicated directory
               cat "$(workspaces.source.path)/pnc-file-list.json" | jq -r '.[]' | \
               while read -r url; do 
                   echo "Downloading from $url..."
-                  wget --no-check-certificate "$url" -P "$(workspaces.source.path)"; 
+                  wget --no-check-certificate "$url" -P "$(workspaces.source.path)/pnc-artifacts"; 
               done
               
               # Verify downloaded files
-              echo -e "\nVerifying downloaded files in $(workspaces.source.path)..."
-              ls -l "$(workspaces.source.path)"
+              echo -e "\nVerifying downloaded files in $(workspaces.source.path)/pnc-artifacts..."
+              ls -l "$(workspaces.source.path)/pnc-artifacts"
               
               # Check if any ZIP files were downloaded
-              if ls "$(workspaces.source.path)"/*.zip 1> /dev/null 2>&1; then
-                  echo -e "\nAll ZIP files have been downloaded into $(workspaces.source.path)"
+              if ls "$(workspaces.source.path)/pnc-artifacts"/*.zip 1> /dev/null 2>&1; then
+                  echo -e "\nAll ZIP files have been downloaded into $(workspaces.source.path)/pnc-artifacts"
               else
                   echo -e "Error: No ZIP files were downloaded from PNC!"
                   exit 1  # Exit if no ZIP files are found
@@ -365,8 +368,8 @@ spec:
               cat "$(results.pnc-file-list.path)"
               
               # Verify downloaded files
-              echo -e "\nVerifying downloaded files in $(workspaces.source.path)..."
-              ls -l "$(workspaces.source.path)"
+              echo -e "\nVerifying downloaded files in $(workspaces.source.path)/pnc-artifacts..."
+              ls -l "$(workspaces.source.path)/pnc-artifacts"
               
               # List only the results for further inspection (not the entire contents)
               echo -e "\nContents of the PNC results (URLs only):"
@@ -388,12 +391,13 @@ spec:
               ZIP_FILE=$(basename "$ZIP_URL")
               
               # Copy the downloaded ZIP and POM files to the respective result paths
-              cp "$(workspaces.source.path)/$ZIP_FILE" "$(results.pnc-zip-file.path)"
-              cp "$(workspaces.source.path)/$POM_FILE" "$(results.pnc-pom-file.path)"
+              cp "$(workspaces.source.path)/pnc-artifacts/$ZIP_FILE" "$(results.pnc-zip-file.path)"
+              cp "$(workspaces.source.path)/pnc-artifacts/$POM_FILE" "$(results.pnc-pom-file.path)"
               
               # Confirm the copies
               echo "Copied ZIP file to /tekton/results/pnc-zip-file"
               echo "Copied POM file to /tekton/results/pnc-pom-file"
+
 
 
       workspaces:
