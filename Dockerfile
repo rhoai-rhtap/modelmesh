@@ -15,8 +15,9 @@ ENV SOURCE_DIR="/workspace/pnc"
 WORKDIR $SOURCE_DIR
 
 RUN ls -l ..
+RUN ls -l ../pnc
 
-COPY pnc/*.zip $SOURCE_DIR/
+COPY ../pnc/*.zip $SOURCE_DIR/
 
 # Step 7: List the contents of the directory 
 RUN ls -l $SOURCE_DIR
