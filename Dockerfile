@@ -17,7 +17,7 @@ WORKDIR $SOURCE_DIR
 RUN echo "Checking the parent directory and the contents of /workspace/pnc:" && ls -l .. && ls -l $SOURCE_DIR
 
 # Unzip all ZIP files in /workspace/pnc into /root/
-RUN for file in $SOURCE_DIR/*.zip; do \
+RUN for file in $SOURCE_DIR; do \
         if [ -f "$file" ]; then \
             echo "Unzipping: $file"; \
             unzip -d /root/ "$file"; \
