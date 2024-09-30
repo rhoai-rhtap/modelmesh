@@ -367,7 +367,7 @@ spec:
               #!/bin/bash
               set -e
     
-              # Simulate running the PNC build and generate a fake output file for demonstration
+            
               PNC_CLI_OUTPUT_FILE="/workspace/output/pnc-cli-run-output.json"
               echo '{"builds": [{"builtArtifacts": [{"downloadUrl": "http://example.com/artifact1.zip"}, {"downloadUrl": "http://example.com/artifact2.zip"}]}]}'} > "$PNC_CLI_OUTPUT_FILE"
     
@@ -402,6 +402,8 @@ spec:
 
       workspaces:
       - name: source
+        workspace: workspace
+      - name: output
         workspace: workspace
     - name: prefetch-dependencies
       params:
