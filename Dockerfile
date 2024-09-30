@@ -25,7 +25,7 @@ RUN ls -la ..
 RUN ls -la ../pnc-artifacts
 
 # Unzip all ZIP files in /workspace/pnc into /root/
-RUN echo "Unzipping files in $SOURCE_DIR..." && \
+RUN echo "$PNC_ZIP_FILES" " && \
     for file in $SOURCE_DIR/*.zip; do \
         if [ -f "$file" ]; then \
             echo "Unzipping: $file"; \
