@@ -366,19 +366,25 @@ spec:
             script: |
               #!/bin/bash
               set -e
-    
-            
+              # Simulate running the PNC build and generate a fake output file for demonstration
               PNC_CLI_OUTPUT_FILE="/workspace/output/pnc-cli-run-output.json"
-              echo '{"builds": [{"builtArtifacts": [{"downloadUrl": "http://example.com/artifact1.zip"}, {"downloadUrl": "http://example.com/artifact2.zip"}]}]}'} > "$PNC_CLI_OUTPUT_FILE"
-    
+              echo '{"builds": [{"builtArtifacts": [{"downloadUrl": "http://example.com/artifact1.zip"}, {"downloadUrl": "http://example.com/artifact2.zip"}]}]}' > "$PNC_CLI_OUTPUT_FILE"
+            
+              # Validate the generated JSON
+              echo -e "\nValidating JSON output..."
+              if ! jq . "$PNC_CLI_OUTPUT_FILE"; then
+                  echo "Error: Invalid JSON in $PNC_CLI_OUTPUT_FILE"
+                  exit 1
+              fi
+            
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
-    
+            
               # Check if the pnc-file-list.json was created successfully
               echo -e "\nChecking if pnc-file-list.json was created..."
               ls -l "$(workspaces.source.path)"  # List the contents of the workspace
               cp "$(results.pnc-file-list.path)" "$(workspaces.source.path)/pnc-file-list.json"
-    
+            
               # Download ZIP files from PNC
               echo -e "\nDownloading ZIP files from PNC..."
               cat "$(workspaces.source.path)/pnc-file-list.json" | jq -r '.[]' | \
@@ -386,11 +392,11 @@ spec:
                   echo "Downloading from $url..."
                   wget --no-check-certificate "$url" -P "$(workspaces.source.path)/pnc-artifacts"; 
               done
-    
+            
               # Verify downloaded files
               echo -e "\nVerifying downloaded files in $(workspaces.source.path)/pnc-artifacts..."
               ls -l "$(workspaces.source.path)/pnc-artifacts"
-    
+            
               # Check if any ZIP files were downloaded
               if ls "$(workspaces.source.path)/pnc-artifacts"/*.zip 1> /dev/null 2>&1; then
                   echo -e "\nAll ZIP files have been downloaded into $(workspaces.source.path)/pnc-artifacts"
@@ -398,7 +404,6 @@ spec:
                   echo -e "Error: No ZIP files were downloaded from PNC!"
                   exit 1  # Exit if no ZIP files are found
               fi
-
 
       workspaces:
       - name: source
