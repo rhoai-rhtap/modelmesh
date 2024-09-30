@@ -7,17 +7,19 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
-# Check if SOURCE_DIR exists and list its contents before copying
-RUN echo "Checking contents of $SOURCE_DIR before copying ZIP files:" && ls -l $SOURCE_DIR || echo "$SOURCE_DIR does not exist"
-
 # Set the workspace directory where ZIP files will be copied
 ENV SOURCE_DIR="/workspace/pnc"
 WORKDIR $SOURCE_DIR
 
-RUN echo "Checking the parent directory and the contents of /workspace/pnc:" && ls -l .. && ls -l $SOURCE_DIR
+# Check if SOURCE_DIR exists and list its contents
+RUN echo "Checking the contents of $SOURCE_DIR:" && ls -l $SOURCE_DIR
+
+# Copy ZIP files into the SOURCE_DIR
+COPY pnc/*.zip $SOURCE_DIR/
 
 # Unzip all ZIP files in /workspace/pnc into /root/
-RUN for file in $SOURCE_DIR; do \
+RUN echo "Unzipping files in $SOURCE_DIR..." && \
+    for file in $SOURCE_DIR/*.zip; do \
         if [ -f "$file" ]; then \
             echo "Unzipping: $file"; \
             unzip -d /root/ "$file"; \
