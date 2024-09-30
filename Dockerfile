@@ -8,17 +8,13 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 # Set the workspace directory where ZIP files will be copied
-ENV SOURCE_DIR="/workspace/pnc"
+ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
+
+RUN echo "Checking the contents of $SOURCE_DIR:" && ls -l $SOURCE_DIR
 
 RUN ls -la ..
 RUN ls -la ../pnc
-
-# Check if SOURCE_DIR exists and list its contents
-RUN echo "Checking the contents of $SOURCE_DIR:" && ls -l $SOURCE_DIR
-
-# Copy ZIP files into the SOURCE_DIR
-COPY ../pnc $SOURCE_DIR/
 
 # Unzip all ZIP files in /workspace/pnc into /root/
 RUN echo "Unzipping files in $SOURCE_DIR..." && \
