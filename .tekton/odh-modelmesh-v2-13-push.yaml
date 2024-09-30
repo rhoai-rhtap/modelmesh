@@ -370,7 +370,11 @@ spec:
             script: |
               #!/bin/bash
               set -e
-
+              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.source.path)/pnc-file-list.json"
+              
+              # Check if the pnc-file-list.json was created successfully
+              echo -e "\nChecking if pnc-file-list.json was created..."
+              ls -l "$(workspaces.source.path)"  # List the contents of the workspace
               # Create a persistent directory in the workspace for storing artifacts
               mkdir -p "$(workspaces.source.path)/pnc-artifacts"
               
