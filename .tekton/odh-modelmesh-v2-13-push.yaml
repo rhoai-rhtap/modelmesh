@@ -396,11 +396,9 @@ spec:
                   echo -e "Error: No ZIP files were downloaded from PNC!"
                   exit 1  # Exit if no ZIP files are found
               fi
-    
-        workspaces:
-          - name: source
-            workspace: workspace
-
+      workspaces:
+      - name: source
+        workspace: workspace
     - name: prefetch-dependencies
       params:
       - name: input
