@@ -11,10 +11,10 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 RUN echo "Checking contents of $SOURCE_DIR before copying ZIP files:" && ls -l $SOURCE_DIR || echo "$SOURCE_DIR does not exist"
 
 # Set the workspace directory where ZIP files will be copied
-#ENV SOURCE_DIR="/workspace/pnc"
-#WORKDIR $SOURCE_DIR
+ENV SOURCE_DIR="/workspace/pnc"
+WORKDIR $SOURCE_DIR
 
-RUN ls -l ..
+RUN ls -l .. && ls -l ../pnc
 #RUN ls -l ..pnc
 
 #COPY ../pnc/*.zip $SOURCE_DIR/
