@@ -4,17 +4,18 @@ ARG CI_CONTAINER_VERSION="unknown"
 
 FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
-ENV pnc-file-list.json 
-RUN echo "Files to download: $pnc-file-list.json
-
-RUN cat "$(workspaces.pnc.path)/pnc-file-list.json"  
-
 # Set the workspace directory where ZIP files will be copied
 ENV SOURCE_DIR="/workspace/pnc"
 WORKDIR $SOURCE_DIR
 
 RUN ls -l ..
-#
+
+COPY source/*.zip $SOURCE_DIR/
+
+# Step 7: List the contents of the directory 
+RUN ls -l $SOURCE_DIR
+
+
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
