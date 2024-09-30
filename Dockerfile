@@ -5,35 +5,31 @@ ARG CI_CONTAINER_VERSION="unknown"
 FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 
 # Install required packages
-RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
 ARG PNC_FILES_JSON
 RUN echo "Files to download: $PNC_FILES_JSON"
 
-
 ARG PNC_ZIP_FILES
 ARG PNC_POM_FILES
 
-RUN echo "ZIP Files to download: $PNC_ZIP_FILES" \
-    && echo "POM Files to download: $PNC_POM_FILES"
+RUN echo "ZIP Files to unzip: $PNC_ZIP_FILES" \
+    && echo "POM Files to use: $PNC_POM_FILES"
 
+# Set the workspace directory where ZIP files are located
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
 
+# Unzip the ZIP files
 RUN echo "$PNC_ZIP_FILES" | jq -r '.[] | select(test("\\.zip$"))' | \
-    while read url; do wget --no-check-certificate "$url"; done && \
-    for file in *.zip; do unzip -d /root/ "$file"; done
+    while read -r zip_file; do 
+        echo "Unzipping: $zip_file" && 
+        unzip -d . "$zip_file"; 
+    done
 
-RUN ls -l 
-
-# Set the workspace directory where ZIP files will be copied
-ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
-WORKDIR $SOURCE_DIR
-
-RUN echo "Checking the contents of $SOURCE_DIR:" && ls -l $SOURCE_DIR
-
-RUN ls -la ..
-RUN ls -la ../pnc-artifacts
+# Check contents of the source directory
+RUN echo "Checking the contents of $SOURCE_DIR after unzipping:" && ls -l $SOURCE_DIR \
+    && echo "Checking the contents of the parent directory:" && ls -la ..
 
 # Unzip all ZIP files in /workspace/pnc into /root/
 RUN echo "$PNC_ZIP_FILES" " && \
