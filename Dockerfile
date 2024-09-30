@@ -7,6 +7,8 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
+RUN ls -l 
+
 # Set the workspace directory where ZIP files will be copied
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
@@ -26,6 +28,18 @@ RUN echo "Unzipping files in $SOURCE_DIR..." && \
             echo "No ZIP files found to unzip in $SOURCE_DIR."; \
         fi; \
     done
+    
+# Process POM files in /workspace/source/pnc-artifacts
+RUN echo "Processing POM files in $SOURCE_DIR..." && \
+    for pom_file in $SOURCE_DIR/*.pom; do \
+        if [ -f "$pom_file" ]; then \
+            echo "Copying POM file: $pom_file"; \
+            cp "$pom_file" /root/; \
+        else \
+            echo "No POM files found to copy in $SOURCE_DIR."; \
+        fi; \
+    done
+
 
 # Check the contents of /root/ after unzipping
 RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
