@@ -372,7 +372,20 @@ spec:
               echo -e "\nContents of the PNC results (URLs only):"
               cat "$(results.pnc-file-list.path)" | jq -r '.[]'
 
+              # Assuming PNC_RESULTS contains the JSON output
+              PNC_RESULTS=$(cat "$(results.pnc-file-list.path)")
               
+              # Extract URLs from PNC results
+              POM_URL=$(echo "$PNC_RESULTS" | jq -r '.[0]')
+              ZIP_URL=$(echo "$PNC_RESULTS" | jq -r '.[1]')
+              
+              # Get the base names of the files
+              POM_FILE=$(basename "$POM_URL")
+              ZIP_FILE=$(basename "$ZIP_URL")
+              
+              # Copy the downloaded files to the respective result paths
+              cp "$(workspaces.pnc.path)/$ZIP_FILE" "$(results.pnc-zip-file.path)"
+              cp "$(workspaces.pnc.path)/$POM_FILE" "$(results.pnc-pom-file.path)"
 
 
       workspaces:
