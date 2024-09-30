@@ -7,11 +7,17 @@ FROM registry.redhat.io/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
+
+
 ARG PNC_ZIP_FILES
 ARG PNC_POM_FILES
 
 RUN echo "ZIP Files to download: $PNC_ZIP_FILES" \
     && echo "POM Files to download: $PNC_POM_FILES"
+
+RUN echo "$PNC_ZIP_FILES" | jq -r '.[] | select(test("\\.zip$"))' | \
+    while read url; do wget --no-check-certificate "$url"; done && \
+    for file in *.zip; do unzip -d /root/ "$file"; done
 
 RUN ls -l 
 
