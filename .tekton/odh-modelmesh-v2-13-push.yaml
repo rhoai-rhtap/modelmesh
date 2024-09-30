@@ -364,13 +364,13 @@ spec:
               echo -e "\nContents of the PNC results:"
               cat "$(results.pnc-file-list.path)"
 
-              POM_URL=$(echo $PNC_RESULTS | jq -r '. | .[0]')
-              ZIP_URL=$(echo $PNC_RESULTS | jq -r '. | .[1]')
+              # Get the filenames from the downloaded files
+              ZIP_FILE_NAME=$(basename "$(ls "$(workspaces.pnc.path)"/*.zip)")
+              POM_FILE_NAME=$(basename "$(ls "$(workspaces.pnc.path)"/*.pom)")
               
-             
-              cp "$ZIP_URL" "$(results.pnc-zip-file.path)"  
-              cp "$POM_URL" "$(results.pnc-pom-file.path)" 
-
+              # Copy the downloaded files to the results paths
+              cp "$(workspaces.pnc.path)/$ZIP_FILE_NAME" "$(results.pnc-zip-file.path)"  
+              cp "$(workspaces.pnc.path)/$POM_FILE_NAME" "$(results.pnc-pom-file.path)" 
 
 
       workspaces:
