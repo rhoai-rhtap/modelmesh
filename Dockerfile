@@ -7,26 +7,17 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
+# Copy downloaded artifacts from /tmp/cachi2 to the workspace
+COPY /tmp/cachi2/* /workspace/source/pnc-artifacts/
+
 # Set the workspace directory where ZIP files are located
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
 
+RUN echo "Verifying download location..." && ls -la $SOURCE_DIR
 
-RUN echo "Verifying download location..." && ls -la /workspace/source
-
-
-RUN echo "Verifying download location..." && ls -la /workspace/source/pnc-artifacts/.
-
-RUN ls -la /workspace/source/pnc-artifacts/..
-
-RUN ls -la $SOURCE_DIR
-
-# Check contents of the source directory
-RUN echo "Checking the contents of $SOURCE_DIR after unzipping:" && ls -l $SOURCE_DIR \
-    && echo "Checking the contents of the parent directory:" && ls -la ..
-
-# Unzip all ZIP files in /workspace/pnc into /root/
-RUN echo "$PNC_ZIP_FILES" && \
+# Unzip all ZIP files in /workspace/source/pnc-artifacts into /root/
+RUN echo "Unzipping files in $SOURCE_DIR..." && \
     for file in $SOURCE_DIR/*.zip; do \
         if [ -f "$file" ]; then \
             echo "Unzipping: $file"; \
@@ -35,7 +26,7 @@ RUN echo "$PNC_ZIP_FILES" && \
             echo "No ZIP files found to unzip in $SOURCE_DIR."; \
         fi; \
     done
-    
+
 # Process POM files in /workspace/source/pnc-artifacts
 RUN echo "Processing POM files in $SOURCE_DIR..." && \
     for pom_file in $SOURCE_DIR/*.pom; do \
@@ -47,9 +38,9 @@ RUN echo "Processing POM files in $SOURCE_DIR..." && \
         fi; \
     done
 
-
 # Check the contents of /root/ after unzipping
 RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
+
 
 
 ###############################################################################
