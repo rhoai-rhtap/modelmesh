@@ -32,7 +32,7 @@ RUN echo "Checking the contents of $SOURCE_DIR after unzipping:" && ls -l $SOURC
     && echo "Checking the contents of the parent directory:" && ls -la ..
 
 # Unzip all ZIP files in /workspace/pnc into /root/
-RUN echo "$PNC_ZIP_FILES" " && \
+RUN echo "$PNC_ZIP_FILES" && \
     for file in $SOURCE_DIR/*.zip; do \
         if [ -f "$file" ]; then \
             echo "Unzipping: $file"; \
