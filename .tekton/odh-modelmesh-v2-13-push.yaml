@@ -407,10 +407,7 @@ spec:
               # Verify downloaded files
               echo -e "\nVerifying downloaded files in $ARTIFACTS_DIR..."
               ls -l "$ARTIFACTS_DIR"
-
-              echo "Downloading from $url..."
-              wget --no-check-certificate "$url" -P "$ARTIFACTS_DIR" || { echo "Failed to download $url"; exit 1; }
-
+              
               echo -e "\nContents of $ARTIFACTS_DIR after downloads:"
               ls -la "$ARTIFACTS_DIR"
 
