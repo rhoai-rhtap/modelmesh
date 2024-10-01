@@ -5,44 +5,31 @@ ARG CI_CONTAINER_VERSION="unknown"
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
 # Install required packages
-#RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
-
-# Use build arguments
-ARG ARTIFACTS_DIR=/workspace/source/cachi2
-
-# Set the workspace directory
-WORKDIR $ARTIFACTS_DIR
-
-# Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-# Check that the artifacts are available (in runtime, during the task execution)
-RUN echo "Checking the contents of $ARTIFACTS_DIR:" && ls -la $ARTIFACTS_DIR
+# Set the workspace directory where ZIP files are located
+ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
+WORKDIR $SOURCE_DIR
 
-# Unzip the files directly from the workspace directory during runtime
-RUN for file in $ARTIFACTS_DIR/*.zip; do \
-      if [ -f "$file" ]; then \
-        echo "Unzipping: $file"; \
-        unzip -d /root/ "$file"; \
-      else \
-        echo "No ZIP files found."; \
-      fi; \
+RUN echo "Verifying download location..." && ls -la $SOURCE_DIR
+
+RUN ls -la $SOURCE_DIR
+# Check contents of the source directory
+RUN echo "Checking the contents of $SOURCE_DIR after unzipping:" && ls -l $SOURCE_DIR \
+    && echo "Checking the contents of the parent directory:" && ls -la ..
+# Unzip all ZIP files in /workspace/pnc into /root/
+RUN echo "$PNC_ZIP_FILES"
+# Unzip all ZIP files in /workspace/source/pnc-artifacts into /root/
+
+RUN echo "Unzipping files in $SOURCE_DIR..." && \
+    for file in $SOURCE_DIR/*.zip; do \
+        if [ -f "$file" ]; then \
+            echo "Unzipping: $file"; \
+            echo "No ZIP files found to unzip in $SOURCE_DIR."; \
+        fi; \
     done
-
-# Process POM files, if they exist
-RUN for pom_file in $ARTIFACTS_DIR/*.pom; do \
-      if [ -f "$pom_file" ]; then \
-        echo "Copying POM file: $pom_file"; \
-        cp "$pom_file" /root/; \
-      else \
-        echo "No POM files found."; \
-      fi; \
-    done
-
-# Check the contents of /root/ after unzipping
+    
 RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
-
-
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
