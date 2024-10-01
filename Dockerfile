@@ -20,7 +20,7 @@ RUN echo "ZIP Files to unzip: $PNC_ZIP_FILES" \
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
 
-RUN ls -la "$ARTIFACTS_DIR"
+RUN ls -la $SOURCE_DIR
 
 # Check contents of the source directory
 RUN echo "Checking the contents of $SOURCE_DIR after unzipping:" && ls -l $SOURCE_DIR \
