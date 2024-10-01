@@ -5,19 +5,22 @@ ARG CI_CONTAINER_VERSION="unknown"
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
 # Install required packages
-RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
+#RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-# Define the workspace where artifacts are stored
+# Use build arguments
 ARG ARTIFACTS_DIR=/workspace/source/pnc-artifacts
 
-# Set the working directory
+# Set the workspace directory
 WORKDIR $ARTIFACTS_DIR
 
-# Verify the contents of the copied directory
-RUN ls -la /workspace/source/pnc-artifacts/
+# Install required packages
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-# Unzip the files (if any ZIP files are present)
-RUN for file in /workspace/source/pnc-artifacts/*.zip; do \
+# Check that the artifacts are available (in runtime, during the task execution)
+RUN echo "Checking the contents of $ARTIFACTS_DIR:" && ls -la $ARTIFACTS_DIR
+
+# Unzip the files directly from the workspace directory during runtime
+RUN for file in $ARTIFACTS_DIR/*.zip; do \
       if [ -f "$file" ]; then \
         echo "Unzipping: $file"; \
         unzip -d /root/ "$file"; \
@@ -26,8 +29,8 @@ RUN for file in /workspace/source/pnc-artifacts/*.zip; do \
       fi; \
     done
 
-# Copy POM files, if they exist
-RUN for pom_file in /workspace/source/pnc-artifacts/*.pom; do \
+# Process POM files, if they exist
+RUN for pom_file in $ARTIFACTS_DIR/*.pom; do \
       if [ -f "$pom_file" ]; then \
         echo "Copying POM file: $pom_file"; \
         cp "$pom_file" /root/; \
@@ -36,7 +39,7 @@ RUN for pom_file in /workspace/source/pnc-artifacts/*.pom; do \
       fi; \
     done
 
-# Verify the contents of /root/
+# Check the contents of /root/ after unzipping
 RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
 
 
