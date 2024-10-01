@@ -13,9 +13,6 @@ ARG ARTIFACTS_DIR=/workspace/source/pnc-artifacts
 # Set the working directory
 WORKDIR $ARTIFACTS_DIR
 
-# Copy the artifacts from the workspace
-COPY ${ARTIFACTS_DIR}/* /workspace/source/pnc-artifacts/
-
 # Verify the contents of the copied directory
 RUN ls -la /workspace/source/pnc-artifacts/
 
