@@ -342,10 +342,6 @@ spec:
         results:
           - description: The file containing the list of pnc built artifacts to be later installed inside the container build
             name: pnc-file-list
-          - description: The file containing the list of pnc built artifacts to be later installed inside the container build
-            name: pnc-zip-file
-          - description: The file containing the list of pnc built artifacts to be later installed inside the container build
-            name: pnc-pom-file
         steps:
           - name: run-pnc-download
             image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
