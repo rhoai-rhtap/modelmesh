@@ -465,6 +465,7 @@ spec:
       - name: BUILD_ARGS
         value:
         - PNC_FILES_JSON=$(tasks.pnc-cli-build.results.pnc-file-list)
+        - PNC_ARTIFACTS_DIR=$(workspaces.source.path)/pnc-artifacts
         - $(params.build-args[*])
        # - PNC_ZIP_FILE=$(echo $PNC_FILES_JSON | jq -r '.[] | select(test("\\.zip$"))')
         #- PNC_POM_FILE=$(echo $PNC_FILES_JSON | jq -r '.[] | select(test("\\.pom$"))')
