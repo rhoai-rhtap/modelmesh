@@ -7,9 +7,8 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-
-RUN echo "ZIP Files to unzip: $PNC_ZIP_FILES" \
-    && echo "POM Files to use: $PNC_POM_FILES"
+RUN ls -la .
+RUN ls -la ..
 
 # Set the workspace directory where ZIP files are located
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
