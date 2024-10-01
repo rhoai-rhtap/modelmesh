@@ -17,8 +17,9 @@ WORKDIR $SOURCE_DIR
 RUN echo "Verifying download location..." && ls -la /workspace/source
 
 
-RUN echo "Verifying download location..." && ls -la /workspace/source/pnc-artifacts
+RUN echo "Verifying download location..." && ls -la /workspace/source/pnc-artifacts/.
 
+RUN ls -la /workspace/source/pnc-artifacts/..
 
 RUN ls -la $SOURCE_DIR
 
