@@ -14,6 +14,12 @@ RUN ls -la ..
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
 
+ARG PNC_ARTIFACTS_DIR
+
+# Copy the PNC artifacts into the container
+COPY ${PNC_ARTIFACTS_DIR} $SOURCE_DIR
+
+
 RUN echo "Verifying download location..." && ls -la /workspace/source
 
 
