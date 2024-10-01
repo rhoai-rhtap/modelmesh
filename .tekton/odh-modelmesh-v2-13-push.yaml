@@ -406,8 +406,8 @@ spec:
       workspaces:
       - name: source
         workspace: workspace
-      - name: output
-        workspace: workspace
+      #- name: output
+        #workspace: workspace
     - name: prefetch-dependencies
       params:
       - name: input
