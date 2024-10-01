@@ -369,8 +369,7 @@ spec:
               #!/bin/bash
               set -e
 
-              # Use the correct path for the pnc-file-list created by the previous task
-              PNC_FILE_LIST_PATH="$(tasks.pnc-cli-build.results.pnc-file-list.path)" 
+              PNC_FILE_LIST_PATH="$(results.pnc-file-list.path)"
 
 
               # Use the correct path for the pnc-file-list.json created by the previous task
@@ -412,8 +411,6 @@ spec:
 
       workspaces:
       - name: source
-        workspace: workspace
-      - name: output
         workspace: workspace
     - name: prefetch-dependencies
       params:
