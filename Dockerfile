@@ -7,41 +7,39 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-RUN ls -la ./tmp
-RUN ls -la ../tmp
+# Define the workspace where artifacts are stored
+ARG ARTIFACTS_DIR=/workspace/source/pnc-artifacts
 
-# Copy downloaded artifacts from /tmp/cachi2 to the workspace
-COPY /tmp/cachi2/* /workspace/source/pnc-artifacts/
+# Set the working directory
+WORKDIR $ARTIFACTS_DIR
 
-# Set the workspace directory where ZIP files are located
-ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
-WORKDIR $SOURCE_DIR
+# Copy the artifacts from the workspace
+COPY ${ARTIFACTS_DIR}/* /workspace/source/pnc-artifacts/
 
-RUN echo "Verifying download location..." && ls -la $SOURCE_DIR
+# Verify the contents of the copied directory
+RUN ls -la /workspace/source/pnc-artifacts/
 
-# Unzip all ZIP files in /workspace/source/pnc-artifacts into /root/
-RUN echo "Unzipping files in $SOURCE_DIR..." && \
-    for file in $SOURCE_DIR/*.zip; do \
-        if [ -f "$file" ]; then \
-            echo "Unzipping: $file"; \
-            unzip -d /root/ "$file"; \
-        else \
-            echo "No ZIP files found to unzip in $SOURCE_DIR."; \
-        fi; \
+# Unzip the files (if any ZIP files are present)
+RUN for file in /workspace/source/pnc-artifacts/*.zip; do \
+      if [ -f "$file" ]; then \
+        echo "Unzipping: $file"; \
+        unzip -d /root/ "$file"; \
+      else \
+        echo "No ZIP files found."; \
+      fi; \
     done
 
-# Process POM files in /workspace/source/pnc-artifacts
-RUN echo "Processing POM files in $SOURCE_DIR..." && \
-    for pom_file in $SOURCE_DIR/*.pom; do \
-        if [ -f "$pom_file" ]; then \
-            echo "Copying POM file: $pom_file"; \
-            cp "$pom_file" /root/; \
-        else \
-            echo "No POM files found to copy in $SOURCE_DIR."; \
-        fi; \
+# Copy POM files, if they exist
+RUN for pom_file in /workspace/source/pnc-artifacts/*.pom; do \
+      if [ -f "$pom_file" ]; then \
+        echo "Copying POM file: $pom_file"; \
+        cp "$pom_file" /root/; \
+      else \
+        echo "No POM files found."; \
+      fi; \
     done
 
-# Check the contents of /root/ after unzipping
+# Verify the contents of /root/
 RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
 
 
