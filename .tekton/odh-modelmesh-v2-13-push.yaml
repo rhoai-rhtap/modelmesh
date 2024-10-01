@@ -369,6 +369,12 @@ spec:
               #!/bin/bash
               set -e
 
+              
+              # Use the parameter values from the previous task
+              PNC_FILE_LIST_PATH="$(params.pnc-file-list)"
+              PNC_ZIP_FILE_PATH="$(params.pnc-zip-file)"
+              PNC_POM_FILE_PATH="$(params.pnc-pom-file)"
+
               # Use the correct path for the pnc-file-list.json created by the previous task
               #PNC_FILE_LIST_PATH="$(workspaces.output.path)/pnc-file-list.json"  # Changed to output
 
