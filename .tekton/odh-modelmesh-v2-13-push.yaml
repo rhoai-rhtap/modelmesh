@@ -367,39 +367,47 @@ spec:
             script: |
               #!/bin/bash
               set -e
-
+              
               #PNC_FILE_LIST_PATH="$(results.pnc-file-list.path)"
 
 
-              PNC_FILE_LIST_PATH="$(workspaces.output.path)/pnc-file-list.json"
-              ARTIFACTS_DIR="/tmp/cachi2"  # Use temporary directory
-    
+              # Use the correct path for the pnc-file-list.json created by the previous task
+              PNC_FILE_LIST_PATH="$(workspaces.output.path)/pnc-file-list.json"  # Changed to output
+
+              # Download artifacts into the 'source' workspace
+              ARTIFACTS_DIR="$(workspaces.source.path)/pnc-artifacts"
+              
               # Ensure the artifacts directory exists
               mkdir -p "$ARTIFACTS_DIR"
-    
+              
               echo -e "\n=== Downloading artifacts from PNC ==="
               if [ -f "$PNC_FILE_LIST_PATH" ]; then
                   cat "$PNC_FILE_LIST_PATH" | jq -r '.[]' | \
                   while read -r url; do 
                       echo "Downloading from $url..."
-                      wget --no-check-certificate "$url" -P "$ARTIFACTS_DIR" || { echo "Failed to download $url"; exit 1; }
+                      wget --no-check-certificate "$url" -P "$ARTIFACTS_DIR"; 
                   done
               else
                   echo "Error: PNC file list does not exist at $PNC_FILE_LIST_PATH"
                   exit 1
               fi
-    
+              
+              # Verify downloaded files
               echo -e "\nVerifying downloaded files in $ARTIFACTS_DIR..."
               ls -l "$ARTIFACTS_DIR"
-    
+              
               # Check if any ZIP files were downloaded
               if ls "$ARTIFACTS_DIR"/*.zip 1> /dev/null 2>&1; then
                   echo -e "\nAll ZIP files have been downloaded into $ARTIFACTS_DIR"
               else
                   echo -e "Error: No ZIP files were downloaded from PNC!"
-                  exit 1
+                  exit 1  # Exit if no ZIP files are found
               fi
-    
+
+              # Verify downloaded files
+              echo -e "\nVerifying downloaded files in $ARTIFACTS_DIR..."
+              ls -l "$ARTIFACTS_DIR"
+              
               echo -e "\nContents of $ARTIFACTS_DIR after downloads:"
               ls -la "$ARTIFACTS_DIR"
 
