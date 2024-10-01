@@ -325,7 +325,10 @@ spec:
               cat  $(results.pnc-file-list.path)
 
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
-              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.output.path)/pnc-file-list.json"         
+              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.output.path)/pnc-file-list.json"   
+
+              echo -e "\nDebug: List of built artifacts (URLs) extracted from PNC CLI output:"
+              cat $(results.pnc-file-list.path)
 
       workspaces:
       - name: output
@@ -404,6 +407,13 @@ spec:
               # Verify downloaded files
               echo -e "\nVerifying downloaded files in $ARTIFACTS_DIR..."
               ls -l "$ARTIFACTS_DIR"
+
+              echo "Downloading from $url..."
+              wget --no-check-certificate "$url" -P "$ARTIFACTS_DIR" || { echo "Failed to download $url"; exit 1; }
+
+              echo -e "\nContents of $ARTIFACTS_DIR after downloads:"
+              ls -la "$ARTIFACTS_DIR"
+
 
       workspaces:
       - name: source
