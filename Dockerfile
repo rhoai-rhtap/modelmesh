@@ -8,7 +8,7 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 #RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
 # Use build arguments
-ARG ARTIFACTS_DIR=/workspace/source/pnc-artifacts
+ARG ARTIFACTS_DIR=/workspace/source/cachi2
 
 # Set the workspace directory
 WORKDIR $ARTIFACTS_DIR
