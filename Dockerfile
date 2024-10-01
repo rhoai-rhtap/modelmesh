@@ -15,6 +15,12 @@ RUN echo "ZIP Files to unzip: $PNC_ZIP_FILES" \
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
 
+RUN echo "Verifying download location..." && ls -la /workspace/source
+
+
+RUN echo "Verifying download location..." && ls -la /workspace/source/pnc-artifacts
+
+
 RUN ls -la $SOURCE_DIR
 
 # Check contents of the source directory
