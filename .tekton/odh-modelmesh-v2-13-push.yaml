@@ -365,11 +365,11 @@ spec:
               #!/bin/bash
               set -e
 
-              PNC_FILE_LIST_PATH="$(results.pnc-file-list.path)"
+              #PNC_FILE_LIST_PATH="$(results.pnc-file-list.path)"
 
 
               # Use the correct path for the pnc-file-list.json created by the previous task
-              #PNC_FILE_LIST_PATH="$(workspaces.output.path)/pnc-file-list.json"  # Changed to output
+              PNC_FILE_LIST_PATH="$(workspaces.output.path)/pnc-file-list.json"  # Changed to output
 
               # Download artifacts into the 'source' workspace
               ARTIFACTS_DIR="$(workspaces.source.path)/pnc-artifacts"
