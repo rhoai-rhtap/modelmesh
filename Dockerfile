@@ -20,14 +20,6 @@ RUN echo "ZIP Files to unzip: $PNC_ZIP_FILES" \
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
 
-# Unzip the ZIP files
-RUN echo "$PNC_ZIP_FILES" | jq -r '.[] | select(test("\\\\.zip$"))' | \
-    while read -r zip_file; do 
-        echo "Unzipping: $zip_file" && \
-        unzip -d . "$zip_file"; 
-    done
-
-
 # Check contents of the source directory
 RUN echo "Checking the contents of $SOURCE_DIR after unzipping:" && ls -l $SOURCE_DIR \
     && echo "Checking the contents of the parent directory:" && ls -la ..
