@@ -409,8 +409,6 @@ spec:
         workspace: workspace
       - name: output
         workspace: workspace
-      - name: tmp
-        workspace: tmp-workspace 
     - name: prefetch-dependencies
       params:
       - name: input
