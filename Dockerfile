@@ -7,8 +7,8 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-RUN ls -la .
-RUN ls -la ..
+RUN ls -la ./tmp
+RUN ls -la ../tmp
 
 # Copy downloaded artifacts from /tmp/cachi2 to the workspace
 COPY /tmp/cachi2/* /workspace/source/pnc-artifacts/
