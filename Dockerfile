@@ -7,11 +7,6 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-@ARG PNC_FILES_JSON
-#RUN echo "Files to download: $PNC_FILES_JSON"
-
-#ARG PNC_ZIP_FILES
-#ARG PNC_POM_FILES
 
 RUN echo "ZIP Files to unzip: $PNC_ZIP_FILES" \
     && echo "POM Files to use: $PNC_POM_FILES"
@@ -80,10 +75,9 @@ RUN sed -i 's:security.provider.12=SunPKCS11:#security.provider.12=SunPKCS11:g' 
 ENV JAVA_HOME=/usr/lib/jvm/jre-17-openjdk
 
 
-## CPaaS CODE BEGIN ##
 COPY --from=stage root/target/dockerhome/ /opt/kserve/mmesh/
 COPY --from=stage root/target/dockerhome/version /etc/modelmesh-version
-## CPaaS CODE END ##
+
 
 # Make this the current directory when starting the container
 WORKDIR /opt/kserve/mmesh
@@ -103,6 +97,10 @@ EXPOSE 8080
 
 # Run as non-root user by default, to allow runAsNonRoot:true without runAsUser
 USER ${USERID}
+#RUN echo "Files to download: $PNC_FILES_JSON"
+#ARG PNC_ZIP_FILES
+#ARG PNC_POM_FILES
+
 
 # The command to run by default when the container is first launched
 CMD ["sh", "-c", "exec /opt/kserve/mmesh/start.sh"]
