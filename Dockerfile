@@ -4,20 +4,16 @@ ARG CI_CONTAINER_VERSION="unknown"
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
+COPY workspace workspace
+
+RUN ls workspace
+
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
-
-RUN ls -la .
-RUN ls -la ..
 
 # Set the workspace directory where ZIP files are located
 ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
 WORKDIR $SOURCE_DIR
-
-ARG PNC_ARTIFACTS_DIR
-
-# Copy the PNC artifacts into the container
-COPY ${PNC_ARTIFACTS_DIR} $SOURCE_DIR
 
 
 RUN echo "Verifying download location..." && ls -la /workspace/source
