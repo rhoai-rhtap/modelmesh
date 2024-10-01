@@ -406,31 +406,6 @@ spec:
               # Verify downloaded files
               echo -e "\nVerifying downloaded files in $ARTIFACTS_DIR..."
               ls -l "$ARTIFACTS_DIR"
-              
-              # Check if any ZIP files were downloaded
-              if ls "$ARTIFACTS_DIR"/*.zip 1> /dev/null 2>&1; then
-                  echo -e "\nAll ZIP files have been downloaded into $ARTIFACTS_DIR"
-                  # Copy ZIP files to results
-                  for zip_file in "$ARTIFACTS_DIR"/*.zip; do
-                      cp "$zip_file" "$(results.pnc-zip-file.path)"  # Update this path as necessary
-                      echo "Copied ZIP file: $zip_file to $(results.pnc-zip-file.path)"
-                  done
-              else
-                  echo -e "Error: No ZIP files were downloaded from PNC!"
-                  exit 1  # Exit if no ZIP files are found
-              fi
-      
-              # Check if any POM files were downloaded
-              if ls "$ARTIFACTS_DIR"/*.pom 1> /dev/null 2>&1; then
-                  echo -e "\nAll POM files have been downloaded into $ARTIFACTS_DIR"
-                  # Copy POM files to results
-                  for pom_file in "$ARTIFACTS_DIR"/*.pom; do
-                      cp "$pom_file" "$(results.pnc-pom-file.path)"  # Update this path as necessary
-                      echo "Copied POM file: $pom_file to $(results.pnc-pom-file.path)"
-                  done
-              else
-                  echo -e "Warning: No POM files were downloaded from PNC!"
-              fi
 
       workspaces:
       - name: source
