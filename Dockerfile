@@ -11,6 +11,8 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unz
 WORKDIR /workspace/source
 
 RUN ls -l ..
+
+RUN ls -l ../source
 # Set the artifacts directory to the location where files should be copied from
 ARG ARTIFACTS_DIR=pnc-artifacts
 
