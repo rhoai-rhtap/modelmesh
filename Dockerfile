@@ -8,9 +8,20 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 RUN ls -l .
 RUN ls -l ..
 
+WORKDIR /workspace/source
+
+# Copy artifacts from the source workspace directly into the image
+COPY . .
+
+RUN ls -l ..
+
 COPY . /workspace/source
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
+
+COPY /workspace/source /workspace/source
+
+RUN ls -l
 
 # Set the workspace directory
 WORKDIR /workspace/source
