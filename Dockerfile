@@ -8,28 +8,38 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
 # Set the workspace directory where ZIP files are located
-ENV SOURCE_DIR="/workspace/source/pnc-artifacts"
-WORKDIR $SOURCE_DIR
+ARG ARTIFACTS_DIR=source/pnc-artifacts
+WORKDIR /workspace/source
 
-RUN echo "Verifying download location..." && ls -la $SOURCE_DIR
+# Copy downloaded artifacts from the source workspace into the image
+COPY ${ARTIFACTS_DIR}/* /workspace/source/pnc-artifacts/
 
-RUN ls -la $SOURCE_DIR
-# Check contents of the source directory
-RUN echo "Checking the contents of $SOURCE_DIR after unzipping:" && ls -l $SOURCE_DIR \
-    && echo "Checking the contents of the parent directory:" && ls -la ..
-# Unzip all ZIP files in /workspace/pnc into /root/
-RUN echo "$PNC_ZIP_FILES"
+# Check that the artifacts are available
+RUN echo "Checking the contents of /workspace/source/pnc-artifacts:" && ls -la /workspace/source/pnc-artifacts
+
 # Unzip all ZIP files in /workspace/source/pnc-artifacts into /root/
-
-RUN echo "Unzipping files in $SOURCE_DIR..." && \
-    for file in $SOURCE_DIR/*.zip; do \
+RUN for file in /workspace/source/pnc-artifacts/*.zip; do \
         if [ -f "$file" ]; then \
             echo "Unzipping: $file"; \
-            echo "No ZIP files found to unzip in $SOURCE_DIR."; \
+            unzip -d /root/ "$file"; \
+        else \
+            echo "No ZIP files found to unzip in /workspace/source/pnc-artifacts."; \
         fi; \
     done
-    
+
+# Process POM files in /workspace/source/pnc-artifacts
+RUN for pom_file in /workspace/source/pnc-artifacts/*.pom; do \
+        if [ -f "$pom_file" ]; then \
+            echo "Copying POM file: $pom_file"; \
+            cp "$pom_file" /root/; \
+        else \
+            echo "No POM files found to copy in /workspace/source/pnc-artifacts."; \
+        fi; \
+    done
+
+# Check the contents of /root/ after unzipping
 RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
+
 
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
