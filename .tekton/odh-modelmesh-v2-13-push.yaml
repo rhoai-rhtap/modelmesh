@@ -376,7 +376,7 @@ spec:
 
               # Download artifacts into the 'source' workspace
               #ARTIFACTS_DIR="$(workspaces.source.path)/pnc-artifacts"
-              ARTIFACTS_DIR="$(workspaces.source.path)
+              ARTIFACTS_DIR="$(workspaces.source.path)"
 
               # Ensure the artifacts directory exists
               mkdir -p "$ARTIFACTS_DIR"
