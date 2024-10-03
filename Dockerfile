@@ -1,7 +1,6 @@
 # Build arguments
 ARG CI_CONTAINER_VERSION="unknown"
 
-#
 # Set the context to the source directory
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
