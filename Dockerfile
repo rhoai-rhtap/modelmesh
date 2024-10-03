@@ -1,20 +1,22 @@
 # Build arguments
-ARG SOURCE_CODE=.
 ARG CI_CONTAINER_VERSION="unknown"
 
+# Set the context to the source directory
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-# Set the workspace directory where ZIP files are located
-ARG ARTIFACTS_DIR=source/pnc-artifacts
+# Set the workspace directory
 WORKDIR /workspace/source
 
-# Copy downloaded artifacts from the source workspace into the image
+# Set the artifacts directory to the location where files should be copied from
+ARG ARTIFACTS_DIR=pnc-artifacts
+
+# Copy downloaded artifacts from the correct path relative to the context
 COPY ${ARTIFACTS_DIR}/* /workspace/source/pnc-artifacts/
 
-# Check that the artifacts are available
+# Verify the contents of the pnc-artifacts directory
 RUN echo "Checking the contents of /workspace/source/pnc-artifacts:" && ls -la /workspace/source/pnc-artifacts
 
 # Unzip all ZIP files in /workspace/source/pnc-artifacts into /root/
@@ -39,6 +41,7 @@ RUN for pom_file in /workspace/source/pnc-artifacts/*.pom; do \
 
 # Check the contents of /root/ after unzipping
 RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
+
 
 
 ###############################################################################
