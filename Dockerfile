@@ -1,9 +1,14 @@
 # Build arguments
 ARG CI_CONTAINER_VERSION="unknown"
+
 #
 # Set the context to the source directory
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
+RUN ls -l .
+RUN ls -l ..
+
+COPY . /workspace/source
 # Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
