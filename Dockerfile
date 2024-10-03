@@ -13,7 +13,9 @@ WORKDIR /workspace/source
 # Copy artifacts from the source workspace directly into the image
 COPY . .
 
-RUN ls -l ..
+RUN ls -la ..
+
+RUN ls -la ../source
 
 COPY . /workspace/source
 # Install required packages
