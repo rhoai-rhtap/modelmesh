@@ -471,6 +471,7 @@ spec:
       - name: BUILD_ARGS_FILE
         value: $(params.build-args-file)
       runAfter:
+      - prefetch-dependencies
       - download-pnc-files
       taskRef:
         params:
