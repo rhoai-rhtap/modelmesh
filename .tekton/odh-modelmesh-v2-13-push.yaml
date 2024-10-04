@@ -336,7 +336,7 @@ spec:
         
     - name: download-pnc-files
       runAfter:
-        - prefetch-dependencies
+        - pnc-cli-build
       taskSpec:
         results:
           - description: The file containing the list of pnc built artifacts to be later installed inside the container build
@@ -425,7 +425,7 @@ spec:
       - name: dev-package-managers
         value: "true"
       runAfter:
-      - pnc-cli-build
+      - download-pnc-files
       taskRef:
         params:
         - name: name
