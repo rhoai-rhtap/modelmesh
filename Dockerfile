@@ -4,8 +4,14 @@ ARG CI_CONTAINER_VERSION="unknown"
 # Set the context to the source directory
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
-# This line can help you verify if files are present during the build process
-RUN ls -la $(workspaces.source.path)
+ARG ARTIFACTS_PATH=$(workspaces.source.path)/source
+
+
+COPY ${ARTIFACTS_PATH}/* /workspace/source/
+
+
+RUN echo "Checking the contents of /workspace/source:" && ls -la /workspace/source
+
 
 
 RUN ls -l .
