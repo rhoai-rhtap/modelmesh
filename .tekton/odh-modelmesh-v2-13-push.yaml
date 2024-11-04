@@ -45,6 +45,8 @@ spec:
     value: 'master'
   - name: pnc-profile
     value: 'prod'
+  - name: prefetch-input
+    value: [{"path": ".", "type": "rpm"}, {"path": ".", "type": "generic"}]
   pipelineSpec:
     finally:
     - name: show-sbom
@@ -281,7 +283,7 @@ spec:
             name: pnc-file-list
         steps:
           - name: run-pnc-build
-            image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
+            image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli@sha256:00f29bb186e3afedbffeb57942038f7d9ad747640e0a4ae2c53c573a8cdece74
             env:
               - name: SSO_SERVICE_ACCOUNT_NAME
                 valueFrom:
@@ -304,16 +306,16 @@ spec:
               set -e
 
               echo -e "\n=== Build config ==="
-              cat /workspace/output/build-config/$(params.build-config-path)
-              cp /workspace/output/build-config/$(params.build-config-path) /workspace/output
+              cat /workspace/source/build-config/$(params.build-config-path)
+              cp /workspace/source/build-config/$(params.build-config-path) /workspace/source
               echo -e "===================="
 
               echo -e "\nReplacing credentials in the CLI config ..."
-              envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /workspace/output/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/output/config.yaml
+              envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /workspace/source/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/source/config.yaml
 
               echo -e "\nStarting the PNC build ..."
-              PNC_CLI_OUTPUT_FILE="/workspace/output/pnc-cli-run-output.json"
-              java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/output -p /workspace/output --profile ${PNC_PROFILE} --jsonOutput > $PNC_CLI_OUTPUT_FILE
+              PNC_CLI_OUTPUT_FILE="/workspace/source/pnc-cli-run-output.json"
+              java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/source -p /workspace/source --profile ${PNC_PROFILE} --jsonOutput > $PNC_CLI_OUTPUT_FILE
 
               echo -e "\nFinished the PNC build!"
               echo -e "\n=== PNC build output ==="
@@ -326,99 +328,18 @@ spec:
               cat  $(results.pnc-file-list.path)
 
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
-              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.output.path)/pnc-file-list.json"   
+              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.output.path)/pnc-file-list.json" 
+              
+              jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: {sha256: .sha256}}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "$(workspaces.source.path)/source/generic_lockfile.yaml"
 
               echo -e "\nDebug: List of built artifacts (URLs) extracted from PNC CLI output:"
               cat $(results.pnc-file-list.path)
-
-      workspaces:
-      - name: output
-        workspace: workspace
-        
-    - name: download-pnc-files
-      runAfter:
-        - pnc-cli-build
-      taskSpec:
-        results:
-          - description: The file containing the list of pnc built artifacts to be later installed inside the container build
-            name: pnc-file-list
-          #- description: The file containing the list of pnc built artifacts to be later installed inside the container build
-            #name: pnc-zip-file
-          #- description: The file containing the list of pnc built artifacts to be later installed inside the container build
-            #name: pnc-pom-file
-        steps:
-          - name: run-pnc-download
-            image: quay.io/rhoai/rhoai-task-toolset:latest
-            env:
-              - name: SSO_SERVICE_ACCOUNT_NAME
-                valueFrom:
-                  secretKeyRef:
-                    name: pnc-secret
-                    key: svc.account.username
-              - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
-                valueFrom:
-                  secretKeyRef:
-                    name: pnc-secret
-                    key: svc.account.password
-              - name: PNC_PROFILE
-                valueFrom:
-                  secretKeyRef:
-                    name: pnc-secret
-                    key: pnc.profile
-            script: |
-              #!/bin/bash
-              set -e
               
-              #PNC_FILE_LIST_PATH="$(results.pnc-file-list.path)"
-
-
-              # Use the correct path for the pnc-file-list.json created by the previous task
-              PNC_FILE_LIST_PATH="$(workspaces.output.path)/pnc-file-list.json"  # Changed to output
-
-              # Download artifacts into the 'source' workspace
-              #ARTIFACTS_DIR="$(workspaces.source.path)/pnc-artifacts"
-              ARTIFACTS_DIR="$(workspaces.source.path)"
-
-              # Ensure the artifacts directory exists
-              mkdir -p "$ARTIFACTS_DIR"
-              
-              echo -e "\n=== Downloading artifacts from PNC ==="
-              if [ -f "$PNC_FILE_LIST_PATH" ]; then
-                  cat "$PNC_FILE_LIST_PATH" | jq -r '.[]' | \
-                  while read -r url; do 
-                      echo "Downloading from $url..."
-                      wget --no-check-certificate "$url" -P "$ARTIFACTS_DIR"; 
-                  done
-              else
-                  echo "Error: PNC file list does not exist at $PNC_FILE_LIST_PATH"
-                  exit 1
-              fi
-              
-              # Verify downloaded files
-              echo -e "\nVerifying downloaded files in $ARTIFACTS_DIR..."
-              ls -l "$ARTIFACTS_DIR"
-              
-              # Check if any ZIP files were downloaded
-              if ls "$ARTIFACTS_DIR"/*.zip 1> /dev/null 2>&1; then
-                  echo -e "\nAll ZIP files have been downloaded into $ARTIFACTS_DIR"
-              else
-                  echo -e "Error: No ZIP files were downloaded from PNC!"
-                  exit 1  # Exit if no ZIP files are found
-              fi
-
-              # Verify downloaded files
-              echo -e "\nVerifying downloaded files in $ARTIFACTS_DIR..."
-              ls -l "$ARTIFACTS_DIR"
-              
-              echo -e "\nContents of $ARTIFACTS_DIR after downloads:"
-              ls -la "$ARTIFACTS_DIR"
-
-
       workspaces:
       - name: source
         workspace: workspace
-      - name: output
-        workspace: workspace
+        
+   
     - name: prefetch-dependencies
       params:
       - name: input
@@ -432,7 +353,7 @@ spec:
         - name: name
           value: prefetch-dependencies
         - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:fd1fda0dcf53938860ae6fcba37f5572ae25ae02dba44c15754fb7ba7549fb5c
+          value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies@sha256:f53fe5482599b39ae2d1004cf09a2026fd9dd3822ab6ef46b51b4a398b0a3232
         - name: kind
           value: task
         resolver: bundles
