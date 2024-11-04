@@ -4,76 +4,19 @@ ARG CI_CONTAINER_VERSION="unknown"
 # Set the context to the source directory
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
 
-ARG ARTIFACTS_PATH=$(workspaces.source.path)/source
 
-
-COPY ${ARTIFACTS_PATH}/* /workspace/source/
-
-
-RUN echo "Checking the contents of /workspace/source:" && ls -la /workspace/source
-
-
-
-RUN ls -l .
-RUN ls -l ..
-
-WORKDIR /workspace/source
-
-# Copy artifacts from the source workspace directly into the image
-COPY . .
-
+RUN ls -la .
 RUN ls -la ..
+RUN ls -la ./cachi2/output
+RUN ls -la ./cachi2/output/deps
+RUN ls -la ./cachi2/cachi2.env
 
-RUN ls -la ../source
-
-COPY . /workspace/source
-# Install required packages
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
 
-COPY /workspace/source /workspace/source
 
-RUN ls -l
-
-# Set the workspace directory
-WORKDIR /workspace/source
-
-RUN ls -l ..
-
-RUN ls -l ../source
-# Set the artifacts directory to the location where files should be copied from
-ARG ARTIFACTS_DIR=pnc-artifacts
-
-# Copy downloaded artifacts from the correct path relative to the context
-COPY ${ARTIFACTS_DIR}/* /workspace/source/pnc-artifacts/
-
-# Verify the contents of the pnc-artifacts directory
-RUN echo "Checking the contents of /workspace/source/pnc-artifacts:" && ls -la /workspace/source/pnc-artifacts
-
-# Unzip all ZIP files in /workspace/source/pnc-artifacts into /root/
-RUN for file in /workspace/source/pnc-artifacts/*.zip; do \
-        if [ -f "$file" ]; then \
-            echo "Unzipping: $file"; \
-            unzip -d /root/ "$file"; \
-        else \
-            echo "No ZIP files found to unzip in /workspace/source/pnc-artifacts."; \
-        fi; \
-    done
-
-# Process POM files in /workspace/source/pnc-artifacts
-RUN for pom_file in /workspace/source/pnc-artifacts/*.pom; do \
-        if [ -f "$pom_file" ]; then \
-            echo "Copying POM file: $pom_file"; \
-            cp "$pom_file" /root/; \
-        else \
-            echo "No POM files found to copy in /workspace/source/pnc-artifacts."; \
-        fi; \
-    done
-
-# Check the contents of /root/ after unzipping
-RUN echo "Contents of /root/ after unzipping:" && ls -l /root/
-
-
-
+RUN cd ./cachi2/output/deps/generic && \
+    for file in *.zip; do unzip -d /root/ "$file"; done
+    
 ###############################################################################
 FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
 
