@@ -1,48 +1,31 @@
+
 # Build arguments
-ARG CI_CONTAINER_VERSION="unknown"
+ARG SOURCE_CODE=.
 
-# Set the context to the source directory
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest AS stage
+FROM registry.redhat.io/ubi8/ubi-minimal@sha256:7583ca0ea52001562bd81a961da3f75222209e6192e4e413ee226cff97dbd48c AS stage
 
-
-RUN ls -la .
-RUN ls -la ..
 RUN ls -la ./cachi2/output
 RUN ls -la ./cachi2/output/deps
-RUN ls -la ./cachi2/cachi2.env
 
-RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq
-
+# Install packages for the install script and extract archives
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
 RUN cd ./cachi2/output/deps/generic && \
     for file in *.zip; do unzip -d /root/ "$file"; done
-    
+
+
 ###############################################################################
-FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:latest as runtime
+#latest tag
+FROM registry.redhat.io/ubi8/openjdk-17-runtime@sha256:dccda1807142b868566032e4855aa39e1621ac16bb15b2031cc6a1bd11980465 as runtime
 
 ## Build args to be used at this step
-ARG CI_CONTAINER_VERSION
 ARG USERID=2000
 
-LABEL com.redhat.component="odh-modelmesh-container" \
-      name="managed-open-data-hub/odh-modelmesh-rhel8" \
-      version="${CI_CONTAINER_VERSION}" \
-      git.url="${CI_MODELMESH_UPSTREAM_URL}" \
-      git.commit="${CI_MODELMESH_UPSTREAM_COMMIT}" \
-      summary="odh-modelmesh" \
-      io.openshift.expose-services="" \
-      io.k8s.display-name="odh-modelmesh" \
-      maintainer="['managed-open-data-hub@redhat.com']" \
-      description="Modelmesh is a distributed LRU cache for serving runtime models" \
-      com.redhat.license_terms="https://www.redhat.com/licenses/Red_Hat_Standard_EULA_20191108.pdf"
 
 USER root
 
 RUN sed -i 's:security.provider.12=SunPKCS11:#security.provider.12=SunPKCS11:g' /usr/lib/jvm/java-17-openjdk-*/conf/security/java.security \
     && sed -i 's:#security.provider.1=SunPKCS11 ${java.home}/lib/security/nss.cfg:security.provider.12=SunPKCS11 ${java.home}/lib/security/nss.cfg:g' /usr/lib/jvm/java-17-openjdk-*/conf/security/java.security
-
-ENV JAVA_HOME=/usr/lib/jvm/jre-17-openjdk
-
 
 COPY --from=stage root/target/dockerhome/ /opt/kserve/mmesh/
 COPY --from=stage root/target/dockerhome/version /etc/modelmesh-version
@@ -52,6 +35,7 @@ COPY --from=stage root/target/dockerhome/version /etc/modelmesh-version
 WORKDIR /opt/kserve/mmesh
 
 RUN microdnf install shadow-utils
+
 RUN useradd -c "Application User" -U -u ${USERID} -m app && \
     chown -R app:0 /home/app && \
     chmod g+w /etc/passwd && \
@@ -59,16 +43,12 @@ RUN useradd -c "Application User" -U -u ${USERID} -m app && \
     mkdir -p log && \
     chown -R app:0 . && \
     chmod -R 771 . && chmod 775 *.sh *.py && \
-    echo "${CI_CONTAINER_VERSION}" > /opt/kserve/mmesh/build-version && \
-    sed -i 's/security.useSystemPropertiesFile=true/security.useSystemPropertiesFile=false/g' $JAVA_HOME/conf/security/java.security
+    echo "${CI_CONTAINER_VERSION}" > /opt/kserve/mmesh/build-version
 
 EXPOSE 8080
 
 # Run as non-root user by default, to allow runAsNonRoot:true without runAsUser
 USER ${USERID}
-#RUN echo "Files to download: $PNC_FILES_JSON"
-#ARG PNC_ZIP_FILES
-#ARG PNC_POM_FILES
 
 
 # The command to run by default when the container is first launched
