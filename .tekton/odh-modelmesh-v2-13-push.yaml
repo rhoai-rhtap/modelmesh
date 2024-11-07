@@ -82,8 +82,6 @@ spec:
       workspaces:
       - name: workspace
         workspace: workspace
-      - name: pnc
-        workspace: workspace
     params:
     - name: build-config-git-url
       description: Source Repository URL containing the build configuration
