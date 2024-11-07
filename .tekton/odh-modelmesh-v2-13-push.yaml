@@ -323,21 +323,13 @@ spec:
               echo -e "\nGetting the list of built files (to be used later in the container build) ..."
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
 
+              jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: {sha256: .sha256}}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "$(workspaces.source.path)/source/generic_lockfile.yaml"
+              
               cat  $(results.pnc-file-list.path)
 
-              echo -e "\nGetting the list of built files (to be used later in the container build) ..."
-              jq '[.builds[].builtArtifacts[]?.downloadUrl]' "$PNC_CLI_OUTPUT_FILE" > "$(workspaces.output.path)/pnc-file-list.json" 
-              
-              jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: {sha256: .sha256}}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "$(workspaces.source.path)/source/generic_lockfile.yaml"
-
-              echo -e "\nDebug: List of built artifacts (URLs) extracted from PNC CLI output:"
-              cat $(results.pnc-file-list.path)
-              
       workspaces:
       - name: source
         workspace: workspace
-        
-   
     - name: prefetch-dependencies
       params:
       - name: input
