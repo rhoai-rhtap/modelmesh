@@ -399,7 +399,6 @@ spec:
           - git.commit=$(params.revision)
       runAfter:
       - prefetch-dependencies
-      - download-pnc-files
       taskRef:
         params:
         - name: name
