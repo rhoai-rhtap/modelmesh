@@ -31,8 +31,6 @@ spec:
     value: Dockerfile
   - name: path-context
     value: .
-  - name: prefetch-input
-    value: rpm
   - name: build-config-git-url
     value: 'https://github.com/rhoai-rhtap/RHOAI-Build-Config.git'
   - name: build-config-revision
