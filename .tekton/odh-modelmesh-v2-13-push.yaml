@@ -347,7 +347,7 @@ spec:
       - name: dev-package-managers
         value: "true"
       runAfter:
-      - download-pnc-files
+      - pnc-cli-build
       taskRef:
         params:
         - name: name
