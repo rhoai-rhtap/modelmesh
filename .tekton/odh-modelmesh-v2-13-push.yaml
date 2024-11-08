@@ -299,9 +299,9 @@ spec:
             set -e
 
             echo -e "\n=== Build config ==="
-            ls -la /var/workdir/source/  # Updated path
+            cat /var/workdir/source  # Updated path
+            cp /var/workdir/source/$(params.build-config-path) /var/workdir/source  # Ensure correct copying
             
-            cp /var/workdir/source/ /var/workdir/source  # Ensure correct copying
             echo -e "===================="
 
              echo -e "\nReplacing credentials in the CLI config ..."
