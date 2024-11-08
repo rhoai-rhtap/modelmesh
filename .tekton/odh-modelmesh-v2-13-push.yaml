@@ -252,63 +252,77 @@ spec:
         workspace: git-auth
     
     - name: pnc-cli-build
+      params:
+        - name: SOURCE_ARTIFACT
+          value: $(tasks.clone-pnc-cli-config-repository.results.SOURCE_ARTIFACT)
       runAfter:
-        - clone-pnc-cli-config-repository
+      - clone-pnc-cli-config-repository
       taskSpec:
+        params:
+          - description: The Trusted Artifact URI pointing to the artifact with the application source code.
+            name: SOURCE_ARTIFACT
+            type: string
+        stepTemplate:
+          volumeMounts:
+            - mountPath: /var/workdir
+              name: workdir
         results:
-          - description: The file containing the list of pnc built artifacts to be later installed inside the container build
-            name: pnc-file-list
+        - description: The file containing the list of pnc built artifacts to be later installed inside the container build
+          name: pnc-file-list
         steps:
-          - name: run-pnc-build
-            image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli@sha256:00f29bb186e3afedbffeb57942038f7d9ad747640e0a4ae2c53c573a8cdece74
-            env:
-              - name: SSO_SERVICE_ACCOUNT_NAME
-                valueFrom:
-                  secretKeyRef:
-                    name: pnc-secret
-                    key: svc.account.username
-              - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
-                valueFrom:
-                  secretKeyRef:
-                    name: pnc-secret
-                    key: svc.account.password
-              - name: PNC_PROFILE
-                valueFrom:
-                  secretKeyRef:
-                    name: pnc-secret
-                    key: pnc.profile
-              
-            script: |
-              #!/bin/bash
-              set -e
+        - name: use-trusted-artifact
+          image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:8391272c4e5011120e9e7fee2c1f339e9405366110bf239dadcbc21e953ce099
+          args:
+            - use
+            - $(params.SOURCE_ARTIFACT)=/var/workdir/source
+        - name: run-pnc-build
+          image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
+          env:
+          - name: SSO_SERVICE_ACCOUNT_NAME
+            valueFrom:
+              secretKeyRef:
+                name: pnc-secret
+                key: svc.account.username
+          - name: SSO_SERVICE_ACCOUNT_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: pnc-secret
+                key: svc.account.password
+          - name: PNC_PROFILE
+            valueFrom:
+              secretKeyRef:
+                name: pnc-secret
+                key: pnc.profile
 
-              echo -e "\n=== Build config ==="
-              cat /workspace/source/build-config/$(params.build-config-path)
-              cp /workspace/source/build-config/$(params.build-config-path) /workspace/source
-              echo -e "===================="
+          script: |
+            #!/bin/bash
+            set -e
 
-              echo -e "\nReplacing credentials in the CLI config ..."
-              envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /workspace/source/cli-config/konflux/configs/pnc_cli/config.yaml > /workspace/source/config.yaml
+            echo -e "\n=== Build config ==="
+            ls -la /var/workdir/source/  # Updated path
+            
+            cp /var/workdir/source/ /var/workdir/source  # Ensure correct copying
+            echo -e "===================="
 
-              echo -e "\nStarting the PNC build ..."
-              PNC_CLI_OUTPUT_FILE="/workspace/source/pnc-cli-run-output.json"
-              java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /workspace/source -p /workspace/source --profile ${PNC_PROFILE} --jsonOutput > $PNC_CLI_OUTPUT_FILE
+             echo -e "\nReplacing credentials in the CLI config ..."
+             envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /var/workdir/source/cli-config/konflux/configs/pnc_cli/config.yaml > /var/workdir/source/config.yaml
 
-              echo -e "\nFinished the PNC build!"
-              echo -e "\n=== PNC build output ==="
-              cat $PNC_CLI_OUTPUT_FILE
-              echo -e "===================="
-
-              echo -e "\nGetting the list of built files (to be used later in the container build) ..."
-              jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
-
-              jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: {sha256: .sha256}}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "$(workspaces.source.path)/source/generic_lockfile.yaml"
-              
-              cat  $(results.pnc-file-list.path)
-
-      workspaces:
-      - name: source
-        workspace: workspace
+            echo -e "\nStarting the PNC build ..."
+            PNC_CLI_OUTPUT_FILE="/var/workdir/source/pnc-cli-run-output.json"
+            java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /var/workdir/source -p /var/workdir/source --profile ${PNC_PROFILE} --jsonOutput > $PNC_CLI_OUTPUT_FILE
+    
+            echo -e "\nFinished the PNC build!"
+            echo -e "\n=== PNC build output ==="
+            cat $PNC_CLI_OUTPUT_FILE
+            echo -e "===================="
+    
+            echo -e "\nGetting the list of built files (to be used later in the container build) ..."
+            jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
+    
+            cat $(results.pnc-file-list.path)
+        volumes:
+          - name: workdir
+            emptyDir: {}
     - name: prefetch-dependencies
       params:
       - name: input
