@@ -322,7 +322,10 @@ spec:
               jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "$(results.pnc-file-list.path)"
 
               jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: {sha256: .sha256}}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "$(workspaces.source.path)/source/generic_lockfile.yaml"
-              
+
+              ls "$(workspaces.source.path)/source/generic_lockfile.yaml"
+              cat "$(workspaces.source.path)/source/generic_lockfile.yaml"
+
               cat  $(results.pnc-file-list.path)
 
       workspaces:
