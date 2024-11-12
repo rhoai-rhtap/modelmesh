@@ -332,11 +332,17 @@ spec:
       - name: source
         workspace: workspace
     - name: prefetch-dependencies
+      timeout: 4h
       params:
       - name: input
         value: $(params.prefetch-input)
       - name: dev-package-managers
         value: "true"
+      - name: config-file-content
+        value: |
+          ---
+          requests_timeout: 10800
+          subprocess_timeout: 36000
       runAfter:
       - pnc-cli-build
       taskRef:
