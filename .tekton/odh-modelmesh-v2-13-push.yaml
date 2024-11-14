@@ -221,9 +221,9 @@ spec:
     - name: clone-build-config-repository
       params:
       - name: CHAINS-GIT_URL
-        value: $(params.build-config-git-url)
+        value: $(tasks.clone-repository.results.url)
       - name: CHAINS-GIT_COMMIT
-        value: $(params.build-config-revision)
+        value: $(tasks.clone-repository.results.commit)
       - name: subdirectory
         value: build-config
       - name: sslVerify
@@ -246,9 +246,9 @@ spec:
     - name: clone-pnc-cli-config-repository
       params:
       - name: CHAINS-GIT_URL
-        value: $(params.pnc-cli-config-git-url)
+        value: $(tasks.clone-repository.results.url)
       - name: CHAINS-GIT_COMMIT
-        value: $(params.pnc-cli-config-revision)
+        value: $(tasks.clone-repository.results.commit)
       - name: subdirectory
         value: cli-config
       - name: sslVerify
