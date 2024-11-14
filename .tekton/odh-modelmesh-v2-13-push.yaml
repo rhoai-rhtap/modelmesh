@@ -220,10 +220,14 @@ spec:
         workspace: git-auth
     - name: clone-build-config-repository
       params:
+      - name: url
+        value: $(params.build-config-git-url)
+      - name: revision
+        value: $(params.build-config-revision)
       - name: CHAINS-GIT_URL
-        value: $(tasks.clone-repository.results.url)
+        value: $(params.build-config-git-url)
       - name: CHAINS-GIT_COMMIT
-        value: $(tasks.clone-repository.results.commit)
+        value: $(params.build-config-revision)
       - name: subdirectory
         value: build-config
       - name: sslVerify
@@ -245,10 +249,14 @@ spec:
 
     - name: clone-pnc-cli-config-repository
       params:
+      - name: url
+        value: $(params.pnc-cli-config-git-url)
+      - name: revision
+        value: $(params.pnc-cli-config-revision)
       - name: CHAINS-GIT_URL
-        value: $(tasks.clone-repository.results.url)
+        value: $(params.pnc-cli-config-git-url)
       - name: CHAINS-GIT_COMMIT
-        value: $(tasks.clone-repository.results.commit)
+        value: $(params.pnc-cli-config-revision)
       - name: subdirectory
         value: cli-config
       - name: sslVerify
