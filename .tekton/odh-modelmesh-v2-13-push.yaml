@@ -1,6 +1,6 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
-#test
+#tes
 metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://github.com/rhoai-rhtap/modelmesh?rev={{revision}}
@@ -220,9 +220,9 @@ spec:
         workspace: git-auth
     - name: clone-build-config-repository
       params:
-      - name: url
+      - name: CHAINS-GIT_URL
         value: $(params.build-config-git-url)
-      - name: revision
+      - name: CHAINS-GIT_COMMIT
         value: $(params.build-config-revision)
       - name: subdirectory
         value: build-config
@@ -245,9 +245,9 @@ spec:
 
     - name: clone-pnc-cli-config-repository
       params:
-      - name: url
+      - name: CHAINS-GIT_URL
         value: $(params.pnc-cli-config-git-url)
-      - name: revision
+      - name: CHAINS-GIT_COMMIT
         value: $(params.pnc-cli-config-revision)
       - name: subdirectory
         value: cli-config
