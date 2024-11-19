@@ -32,7 +32,7 @@ spec:
   - name: path-context
     value: .
   - name: build-config-git-url
-    value: 'https://github.com/rhoai-rhtap/RHOAI-Build-Config.git'
+    value: 'rhoai-rhtap/RHOAI-Build-Config.git'
   - name: build-config-revision
     value: 'rhoai-2.13'
   - name: build-config-path
@@ -263,28 +263,7 @@ spec:
             name: SOURCE_ARTIFACT
             type: string
         volumes:
-          - name: activation-key
-            secret:
-              optional: true
-              secretName: $(params.ACTIVATION_KEY)
-          - name: additional-secret
-            secret:
-              optional: true
-              secretName: $(params.ADDITIONAL_SECRET)
-          - name: etc-pki-entitlement
-            secret:
-              optional: true
-              secretName: $(params.ENTITLEMENT_SECRET)
           - name: shared
-            emptyDir: {}
-          - name: trusted-ca
-            configMap:
-              items:
-                - key: $(params.caTrustConfigMapKey)
-                  path: ca-bundle.crt
-              name: $(params.caTrustConfigMapName)
-              optional: true
-          - name: varlibcontainers
             emptyDir: {}
           - name: workdir
             emptyDir: {}
@@ -306,18 +285,6 @@ spec:
         - name: run-pnc-build
           image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
           workingDir: /var/workdir
-          volumeMounts:
-            - mountPath: /var/lib/containers
-              name: varlibcontainers
-            - mountPath: /entitlement
-              name: etc-pki-entitlement
-            - mountPath: /activation-key
-              name: activation-key
-            - mountPath: /additional-secret
-              name: additional-secret
-            - mountPath: /mnt/trusted-ca
-              name: trusted-ca
-              readOnly: true
           env:
           - name: SSO_SERVICE_ACCOUNT_NAME
             valueFrom:
@@ -342,12 +309,10 @@ spec:
             echo -e "\n=== Build config ==="
             ls -l /var/workdir/source
             ls -l /var/workdir/source/*/
-            curl https://raw.githubusercontent.com/rhoai-rhtap/RHOAI-Build-Config/refs/heads/rhoai-2.13/odh-pig-builds/build-config.yaml -o /shared/build-config.yaml
-            #git clone https://github.com/rhoai-rhtap/RHOAI-Build-Config.git /shared/RBC
+            curl https://raw.githubusercontent.com/$(params.build-config-git-url)/refs/heads/$(params.build-config-revision)/$(params.build-config-path) -o /shared/build-config.yaml
             cat /shared/build-config.yaml
-            cp /var/workdir/source/build-config/$(params.build-config-path) /var/workdir/source
+            cp /shared/build-config.yaml /var/workdir/source
             
-            exit 1
             echo -e "===================="
 
             echo -e "\nReplacing credentials in the CLI config ..."
