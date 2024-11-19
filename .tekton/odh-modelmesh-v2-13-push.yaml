@@ -342,8 +342,8 @@ spec:
             echo -e "\n=== Build config ==="
             ls -l /var/workdir/source
             ls -l /var/workdir/source/*/
-            curl https://raw.githubusercontent.com/rhoai-rhtap/RHOAI-Build-Config/refs/heads/rhoai-2.13/odh-pig-builds/build-config.yaml -o /var/workdir/source/build-config.yaml
-            git clone https://github.com/rhoai-rhtap/RHOAI-Build-Config.git
+            curl https://raw.githubusercontent.com/rhoai-rhtap/RHOAI-Build-Config/refs/heads/rhoai-2.13/odh-pig-builds/build-config.yaml -o /shared/source/build-config.yaml
+            git clone https://github.com/rhoai-rhtap/RHOAI-Build-Config.git /shared/RBC
             cat /var/workdir/source/build-config.yaml
             cp /var/workdir/source/build-config/$(params.build-config-path) /var/workdir/source
             
