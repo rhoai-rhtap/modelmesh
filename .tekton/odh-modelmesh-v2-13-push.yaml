@@ -255,6 +255,32 @@ spec:
       params:
         - name: SOURCE_ARTIFACT
           value: $(tasks.clone-pnc-cli-config-repository.results.SOURCE_ARTIFACT)
+      volumes:
+        - name: activation-key
+          secret:
+            optional: true
+            secretName: $(params.ACTIVATION_KEY)
+        - name: additional-secret
+          secret:
+            optional: true
+            secretName: $(params.ADDITIONAL_SECRET)
+        - name: etc-pki-entitlement
+          secret:
+            optional: true
+            secretName: $(params.ENTITLEMENT_SECRET)
+        - name: shared
+          emptyDir: {}
+        - name: trusted-ca
+          configMap:
+            items:
+              - key: $(params.caTrustConfigMapKey)
+                path: ca-bundle.crt
+            name: $(params.caTrustConfigMapName)
+            optional: true
+        - name: varlibcontainers
+          emptyDir: {}
+        - name: workdir
+          emptyDir: {}
       runAfter:
       - clone-pnc-cli-config-repository
       taskSpec:
