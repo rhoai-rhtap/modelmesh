@@ -311,16 +311,16 @@ spec:
             ls -l /var/workdir/source/*/
             curl https://raw.githubusercontent.com/$(params.build-config-git-url)/refs/heads/$(params.build-config-revision)/$(params.build-config-path) -o /shared/build-config.yaml
             cat /shared/build-config.yaml
-            cp /shared/build-config.yaml /var/workdir/source
+            #cp /var/workdir/source/cli-config/konflux/configs/pnc_cli/config.yaml /shared/config.yaml 
             
             echo -e "===================="
 
             echo -e "\nReplacing credentials in the CLI config ..."
-            envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /var/workdir/source/cli-config/konflux/configs/pnc_cli/config.yaml > /var/workdir/source/config.yaml
+            envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /var/workdir/source/cli-config/konflux/configs/pnc_cli/config.yaml > /shared/config.yaml
 
             echo -e "\nStarting the PNC build ..."
-            PNC_CLI_OUTPUT_FILE="/var/workdir/source/pnc-cli-run-output.json"
-            java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /var/workdir/source -p /var/workdir/source --profile ${PNC_PROFILE} --jsonOutput > $PNC_CLI_OUTPUT_FILE
+            PNC_CLI_OUTPUT_FILE="/shared/pnc-cli-run-output.json"
+            java -jar /home/jboss/bacon.jar pig run --mode=FORCE --downloadAttempts=3 /shared -p /shared --profile ${PNC_PROFILE} --jsonOutput > $PNC_CLI_OUTPUT_FILE
     
             echo -e "\nFinished the PNC build!"
             echo -e "\n=== PNC build output ==="
