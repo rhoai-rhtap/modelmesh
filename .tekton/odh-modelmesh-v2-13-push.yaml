@@ -32,7 +32,7 @@ spec:
   - name: path-context
     value: .
   - name: build-config-git-url
-    value: 'rhoai-rhtap/RHOAI-Build-Config.git'
+    value: 'rhoai-rhtap/RHOAI-Build-Config'
   - name: build-config-revision
     value: 'rhoai-2.13'
   - name: build-config-path
