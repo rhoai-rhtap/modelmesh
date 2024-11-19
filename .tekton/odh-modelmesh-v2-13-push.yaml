@@ -312,7 +312,7 @@ spec:
             curl https://raw.githubusercontent.com/$(params.build-config-git-url)/refs/heads/$(params.build-config-revision)/$(params.build-config-path) -o /shared/build-config.yaml
             cat /shared/build-config.yaml
             #cp /var/workdir/source/cli-config/konflux/configs/pnc_cli/config.yaml /shared/config.yaml 
-            cp /var/workdir/source/* /shared
+            cp -r /var/workdir/source/* /shared
             
             echo -e "===================="
 
