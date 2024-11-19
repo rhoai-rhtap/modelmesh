@@ -264,8 +264,6 @@ spec:
             type: string
         stepTemplate:
           volumeMounts:
-            - mountPath: /shared
-              name: shared
             - mountPath: /var/workdir
               name: workdir
         results:
@@ -304,7 +302,7 @@ spec:
             ls -l /var/workdir/source
             cat /var/workdir/source/build-config/$(params.build-config-path)
             cp /var/workdir/source/build-config/$(params.build-config-path) /var/workdir/source
-            
+            exit 1
             echo -e "===================="
 
             echo -e "\nReplacing credentials in the CLI config ..."
