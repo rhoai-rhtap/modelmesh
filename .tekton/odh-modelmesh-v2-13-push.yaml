@@ -195,32 +195,32 @@ spec:
       workspaces:
       - name: basic-auth
         workspace: git-auth
-    - name: clone-build-config-repository
-      params:
-      - name: url
-        value: $(params.build-config-git-url)
-      - name: revision
-        value: $(params.build-config-revision)
-      - name: subdirectory
-        value: build-config
-      - name: sslVerify
-        value: false
-      - name: ociStorage
-        value: $(params.output-image).git
-      - name: ociArtifactExpiresAfter
-        value: $(params.image-expires-after)
-      taskRef:
-        params:
-        - name: name
-          value: git-clone-oci-ta
-        - name: bundle
-          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:d1e63ec00bed1c9f0f571fa76b4da570be49a7c255c610544a461495230ba1b1
-        - name: kind
-          value: task
-        resolver: bundles
-      workspaces:
-      - name: basic-auth
-        workspace: git-auth
+#    - name: clone-build-config-repository
+#      params:
+#      - name: url
+#        value: $(params.build-config-git-url)
+#      - name: revision
+#        value: $(params.build-config-revision)
+#      - name: subdirectory
+#        value: build-config
+#      - name: sslVerify
+#        value: false
+#      - name: ociStorage
+#        value: $(params.output-image).git
+#      - name: ociArtifactExpiresAfter
+#        value: $(params.image-expires-after)
+#      taskRef:
+#        params:
+#        - name: name
+#          value: git-clone-oci-ta
+#        - name: bundle
+#          value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:d1e63ec00bed1c9f0f571fa76b4da570be49a7c255c610544a461495230ba1b1
+#        - name: kind
+#          value: task
+#        resolver: bundles
+#      workspaces:
+#      - name: basic-auth
+#        workspace: git-auth
 
     - name: clone-pnc-cli-config-repository
       params:
@@ -236,8 +236,8 @@ spec:
         value: $(params.output-image).git
       - name: ociArtifactExpiresAfter
         value: $(params.image-expires-after)
-      runAfter:
-      - clone-build-config-repository
+#      runAfter:
+#      - clone-build-config-repository
       taskRef:
         params:
         - name: name
