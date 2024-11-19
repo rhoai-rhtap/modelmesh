@@ -316,7 +316,7 @@ spec:
             echo -e "===================="
 
             echo -e "\nReplacing credentials in the CLI config ..."
-            envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /var/workdir/source/cli-config/konflux/configs/pnc_cli/config.yaml > /shared/config.yaml
+            envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < /var/workdir/source/konflux/configs/pnc_cli/config.yaml > /shared/config.yaml
 
             echo -e "\nStarting the PNC build ..."
             PNC_CLI_OUTPUT_FILE="/shared/pnc-cli-run-output.json"
