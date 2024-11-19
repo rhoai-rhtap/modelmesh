@@ -300,7 +300,7 @@ spec:
 
             echo -e "\n=== Build config ==="
             ls -l /var/workdir/source
-            ls -l */
+            ls -l /var/workdir/source/*/
             cat /var/workdir/source/build-config/$(params.build-config-path)
             cp /var/workdir/source/build-config/$(params.build-config-path) /var/workdir/source
             exit 1
