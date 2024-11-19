@@ -277,6 +277,19 @@ spec:
             - $(params.SOURCE_ARTIFACT)=/var/workdir/source
         - name: run-pnc-build
           image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
+          workingDir: /var/workdir
+          volumeMounts:
+            - mountPath: /var/lib/containers
+              name: varlibcontainers
+            - mountPath: /entitlement
+              name: etc-pki-entitlement
+            - mountPath: /activation-key
+              name: activation-key
+            - mountPath: /additional-secret
+              name: additional-secret
+            - mountPath: /mnt/trusted-ca
+              name: trusted-ca
+              readOnly: true
           env:
           - name: SSO_SERVICE_ACCOUNT_NAME
             valueFrom:
