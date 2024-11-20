@@ -14,6 +14,7 @@ env:
   SSO_SERVICE_ACCOUNT_CLIENT_SECRET: ${{ secrets.SSO_SERVICE_ACCOUNT_CLIENT_SECRET }}
   PNC_PROFILE: ${{ secrets.PNC_PROFILE }}
   PNC_CLI_CONFIG_GIT_URL: https://gitlab.cee.redhat.com/project-ncl/utils.git
+  PNC_CLI_CONFIG_REVISION: master
 
 permissions:
   contents: write
@@ -36,7 +37,17 @@ jobs:
           cd $work_dir
           echo "work_dir=$work_dir" >> $GITHUB_OUTPUT
           echo "abs_cwd=$abs_cwd" >> $GITHUB_OUTPUT
-
+          
+          #install dependencies
+          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          arch="$(uname -m | sed 's/x86_64/amd64/')"
+          yq_version="v4.44.3"
+          yq_filename="yq-$yq_version"
+          echo "-> Downloading yq" >&2
+          curl -sSfLo "$yq_filename" "https://github.com/mikefarah/yq/releases/download/$yq_version/yq_${os}_${arch}"
+          chmod +x $yq_filename
+          ln -s $yq_filename yq
+          cp $yq_filename /usr/local/bin/yq
       - name: Get Current branch name
         id: get_branch
         shell: bash
@@ -51,45 +62,44 @@ jobs:
             config/${{ vars.COMPONENT }}-pig-build-config.yaml
           sparse-checkout-cone-mode: false
       - name: Checkout PNC cli config
+        id: checkout-pnc-cli-config
         run: |
           checkout_dir=${{ steps.setup.outputs.work_dir }}/cli-config
           mkdir -p $checkout_dir
           cd $checkout_dir
-          rhoai_version=${{ steps.get_branch.outputs.branch }}
-          git config --global init.defaultBranch ${rhoai_version}
+          git config --global init.defaultBranch ${PNC_CLI_CONFIG_REVISION}
           git init -q
           git remote add origin ${PNC_CLI_CONFIG_GIT_URL}
-          
-          
-          arch="$(uname -m | sed 's/x86_64/amd64/')"
-          yq_version="v4.44.3"
+          git config core.sparseCheckout true
+          git config core.sparseCheckoutCone false
+          echo "konflux/configs/pnc_cli/config.yaml" >> .git/info/sparse-checkout
+          git fetch -q --depth=1 origin ${PNC_CLI_CONFIG_REVISION}
+          git checkout -q ${PNC_CLI_CONFIG_REVISION}
+          PNC_CLI_BUILD_CONFIG_PATH=${checkout_dir}/konflux/configs/pnc_cli/config.yaml
+          echo "PNC_CLI_BUILD_CONFIG_PATH=${PNC_CLI_BUILD_CONFIG_PATH}" >> $GITHUB_OUTPUT
+
       - name: Run PNC Build
         run: |
-          #install dependencies
-          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
-          arch="$(uname -m | sed 's/x86_64/amd64/')"
-          yq_version="v4.44.3"
-          yq_filename="yq-$yq_version"
-          echo "-> Downloading yq" >&2
-          curl -sSfLo "$yq_filename" "https://github.com/mikefarah/yq/releases/download/$yq_version/yq_${os}_${arch}"
-          chmod +x $yq_filename
-          ln -s $yq_filename yq
-          cp $yq_filename /usr/local/bin/yq
-          
           BUILD_CONFIG_URL=rhoai-rhtap/RHOAI-Build-Config
           BUILD_CONFIG_REVISION=rhoai-2.13
           BUILD_CONFIG_PATH=odh-pig-builds/build-config.yaml
           
           echo -e "===================="
           
-          echo -e "\nDownloading the build config ..."
-          curl https://raw.githubusercontent.com/${BUILD_CONFIG_URL}/refs/heads/${BUILD_CONFIG_REVISION}/${BUILD_CONFIG_PATH} -o build-config.yaml
+          echo -e "\nChecking and copying the build config ..."
+          ${BUILD_CONFIG_PATH}=${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}/config/${{ vars.COMPONENT }}-pig-build-config.yaml
+          ls -l ${BUILD_CONFIG_PATH}
+          cp ${BUILD_CONFIG_PATH} build-config.yaml
+          ls -l
+          #curl https://raw.githubusercontent.com/${BUILD_CONFIG_URL}/refs/heads/${BUILD_CONFIG_REVISION}/${BUILD_CONFIG_PATH} -o build-config.yaml
           
-          echo -e "\nDownloading the PNC cli config ..."
-          curl -k "https://gitlab.cee.redhat.com/project-ncl/utils/-/raw/master/konflux/configs/pnc_cli/config.yaml?ref_type=heads&inline=false" -o pnc-cli-config.yaml
+          echo -e "\nChecking the PNC cli config ..."
+          ls -l ${{ steps.checkout-pnc-cli-config.outputs.PNC_CLI_BUILD_CONFIG_PATH }}
+          #curl -k "https://gitlab.cee.redhat.com/project-ncl/utils/-/raw/master/konflux/configs/pnc_cli/config.yaml?ref_type=heads&inline=false" -o pnc-cli-config.yaml
 
           echo -e "\nReplacing credentials in the CLI config ..."
-          envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < pnc-cli-config.yaml > config.yaml
+          envsubst '${SSO_SERVICE_ACCOUNT_NAME} ${SSO_SERVICE_ACCOUNT_CLIENT_SECRET}' < ${{ steps.checkout-pnc-cli-config.outputs.PNC_CLI_BUILD_CONFIG_PATH }} > config.yaml
+          ls -l
 
           echo -e "\nStarting the PNC build ..."
           PNC_CLI_OUTPUT_FILE="pnc-cli-run-output.json"
@@ -106,7 +116,7 @@ jobs:
           
           jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: {sha256: .sha256}}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "generic_lockfile.yaml"
           cat generic_lockfile.yaml
-          
           ls -l
-          cd ../
-          rm -rf $work_dir
+      - name: Cleanup workspace
+        run: |
+          rm -rf ${{ steps.setup.outputs.work_dir }}
