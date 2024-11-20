@@ -1,0 +1,43 @@
+name: Trial
+
+on:
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - 'rhoai-*'
+#    paths:
+#      - build/operator-nudging.yaml
+
+env:
+  GITHUB_ORG: rhoai-rhtap
+  SSO_SERVICE_ACCOUNT_NAME: ${{ secrets.SSO_SERVICE_ACCOUNT_NAME }}
+  SSO_SERVICE_ACCOUNT_CLIENT_SECRET: ${{ secrets.SSO_SERVICE_ACCOUNT_CLIENT_SECRET }}
+  PNC_PROFILE: ${{ secrets.PNC_PROFILE }}
+
+permissions:
+  contents: write
+
+jobs:
+  run-pnc-build:
+    runs-on:
+      - self-hosted
+      - pnc
+    container:
+      image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
+      options: --user root
+    steps:
+      - name: Run PNC Build
+        id: run_pnc_build
+        run: |
+          pwd
+          abs_cwd=$(pwd)
+          work_dir=pnc-$(date +%s)
+          mkdir $work_dir
+          cd $work_dir
+          echo "abs_cwd=$abs_cwd" >> $GITHUB_OUTPUT
+          pwd
+      - name: Run PNC Build
+        run: |
+          pwd
+          cd ${{ steps.run_pnc_build.outputs.abs_cwd }}
+          pwd
