@@ -73,6 +73,8 @@ jobs:
           cat pnc-file-list.json
           
           jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: {sha256: .sha256}}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "generic_lockfile.yaml"
+          cat generic_lockfile.yaml
+          
           ls -l
           ls -l /home/jboss/
           cd ../
