@@ -114,8 +114,8 @@ jobs:
           jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "$PNC_CLI_OUTPUT_FILE" > "pnc-file-list.json"
           cat pnc-file-list.json
           
-          jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: {sha256: .sha256}}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "generic_lockfile.yaml"
-          cat generic_lockfile.yaml
+          jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: ("sha256:" + .sha256)}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "artifacts.lock.yaml"
+          cat artifacts.lock.yaml
           ls -l
       - name: Cleanup workspace
         run: |
