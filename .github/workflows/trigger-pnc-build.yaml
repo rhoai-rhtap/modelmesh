@@ -37,3 +37,4 @@ jobs:
           BUILD_CONFIG_PATH=odh-pig-builds/build-config.yaml
           curl https://raw.githubusercontent.com/${BUILD_CONFIG_URL}/refs/heads/${BUILD_CONFIG_REVISION}/${BUILD_CONFIG_PATH} -o build-config.yaml
           ls -l
+          ls -l /home/jboss/
