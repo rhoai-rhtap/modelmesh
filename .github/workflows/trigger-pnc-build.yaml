@@ -30,8 +30,8 @@ jobs:
       - name: List all files
         run: |
           pwd
-          mkdir pnc
-          cd pnc
+          mkdir pnc1
+          cd pnc1
           BUILD_CONFIG_URL=rhoai-rhtap/RHOAI-Build-Config
           BUILD_CONFIG_REVISION=rhoai-2.13
           BUILD_CONFIG_PATH=odh-pig-builds/build-config.yaml
