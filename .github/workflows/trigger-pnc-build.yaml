@@ -2,9 +2,9 @@ name: Trigger PNC Build
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 'rhoai-*'
+#  push:
+#    branches:
+#      - 'rhoai-*'
 #    paths:
 #      - build/operator-nudging.yaml
 
