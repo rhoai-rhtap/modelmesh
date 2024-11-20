@@ -30,11 +30,13 @@ jobs:
       - name: List all files
         run: |
           pwd
-          mkdir pnc1
+          work_dir=pnc-$(date +%s)
+          mkdir $work_dir
           cd pnc1
           BUILD_CONFIG_URL=rhoai-rhtap/RHOAI-Build-Config
           BUILD_CONFIG_REVISION=rhoai-2.13
           BUILD_CONFIG_PATH=odh-pig-builds/build-config.yaml
           curl https://raw.githubusercontent.com/${BUILD_CONFIG_URL}/refs/heads/${BUILD_CONFIG_REVISION}/${BUILD_CONFIG_PATH} -o build-config.yaml
+          curl -k https://gitlab.cee.redhat.com/project-ncl/utils/-/raw/master/konflux/configs/pnc_cli/config.yaml?ref_type=heads&inline=false -o config.yaml
           ls -l
           ls -l /home/jboss/
