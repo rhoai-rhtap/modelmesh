@@ -37,7 +37,8 @@ jobs:
           BUILD_CONFIG_REVISION=rhoai-2.13
           BUILD_CONFIG_PATH=odh-pig-builds/build-config.yaml
           curl https://raw.githubusercontent.com/${BUILD_CONFIG_URL}/refs/heads/${BUILD_CONFIG_REVISION}/${BUILD_CONFIG_PATH} -o build-config.yaml
-          curl -k https://gitlab.cee.redhat.com/project-ncl/utils/-/raw/master/konflux/configs/pnc_cli/config.yaml?ref_type=heads&inline=false -o config.yaml
+          curl -k "https://gitlab.cee.redhat.com/project-ncl/utils/-/raw/master/konflux/configs/pnc_cli/config.yaml?ref_type=heads&inline=false" -o pnc-cli-config.yaml
+          
           ls -l
           ls -l /home/jboss/
           cd ../
