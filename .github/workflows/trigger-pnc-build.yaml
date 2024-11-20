@@ -58,9 +58,9 @@ jobs:
           repository: ${{ env.GITHUB_ORG }}/RHOAI-Build-Config
           ref: ${{ steps.get_branch.outputs.branch }}
           path: ${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}
-          sparse-checkout: |
-            config/${{ vars.COMPONENT }}-pig-build-config.yaml
-          sparse-checkout-cone-mode: false
+#          sparse-checkout: |
+#            config/${{ vars.COMPONENT }}-pig-build-config.yaml
+#          sparse-checkout-cone-mode: false
       - name: Checkout PNC cli config
         id: checkout-pnc-cli-config
         run: |
@@ -118,5 +118,6 @@ jobs:
           cat artifacts.lock.yaml
           ls -l
       - name: Cleanup workspace
+        if: always()
         run: |
           rm -rf ${{ steps.setup.outputs.work_dir }}
