@@ -1,0 +1,36 @@
+name: Trigger PNC Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'rhoai-*'
+#    paths:
+#      - build/operator-nudging.yaml
+
+env:
+  GITHUB_ORG: rhoai-rhtap
+  RESOLVE_CONFLICTS_FOR: build/operator-nudging.yaml
+  SSO_SERVICE_ACCOUNT_NAME: something
+  SSO_SERVICE_ACCOUNT_CLIENT_SECRET: something
+  PNC_PROFILE: something
+
+permissions:
+  contents: write
+
+jobs:
+  operator-processor:
+    runs-on:
+      - self-hosted
+      - pnc
+    container: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
+    steps:
+      - name: List all files
+        run: |
+          mkdir pnc
+          cd pnc
+          BUILD_CONFIG_URL=rhoai-rhtap/RHOAI-Build-Config
+          BUILD_CONFIG_REVISION=rhoai-2.13
+          BUILD_CONFIG_PATH=odh-pig-builds/build-config.yaml
+          curl https://raw.githubusercontent.com/${BUILD_CONFIG_URL}/refs/heads/${BUILD_CONFIG_REVISION}/${BUILD_CONFIG_PATH} -o build-config.yaml
+          ls -l
