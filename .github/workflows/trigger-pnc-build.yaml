@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 jobs:
-  operator-processor:
+  run-pnc-build:
     runs-on:
       - self-hosted
       - pnc
@@ -26,7 +26,7 @@ jobs:
       image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
       options: --user root
     steps:
-      - name: List all files
+      - name: Run PNC Build
         run: |
           pwd
           work_dir=pnc-$(date +%s)
