@@ -108,7 +108,7 @@ jobs:
           echo -e "===================="
           
           echo -e "\nChecking and copying the build config ..."
-          ${BUILD_CONFIG_PATH}=${{ steps.checkout-build-config.outputs.BUILD_CONFIG_PATH }}
+          BUILD_CONFIG_PATH=${{ steps.checkout-build-config.outputs.BUILD_CONFIG_PATH }}
           ls -l ${BUILD_CONFIG_PATH}
           cp ${BUILD_CONFIG_PATH} build-config.yaml
           ls -l
