@@ -32,7 +32,7 @@ jobs:
           pwd
           work_dir=pnc-$(date +%s)
           mkdir $work_dir
-          cd pnc1
+          cd $work_dir
           BUILD_CONFIG_URL=rhoai-rhtap/RHOAI-Build-Config
           BUILD_CONFIG_REVISION=rhoai-2.13
           BUILD_CONFIG_PATH=odh-pig-builds/build-config.yaml
