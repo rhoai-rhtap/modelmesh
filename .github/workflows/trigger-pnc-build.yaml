@@ -53,11 +53,29 @@ jobs:
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
       - name: Git checkout build config
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.GITHUB_ORG }}/RHOAI-Build-Config
-          ref: ${{ steps.get_branch.outputs.branch }}
-          path: ${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}
+        id: checkout-build-config
+        run: |
+          checkout_dir=${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}
+          rhoai_version=${{ steps.get_branch.outputs.branch }}
+          mkdir -p $checkout_dir
+          cd $checkout_dir
+          git config --global init.defaultBranch ${rhoai_version}
+          git init -q
+          git remote add origin https://github.com/${{ env.GITHUB_ORG }}/RHOAI-Build-Config
+          git config core.sparseCheckout true
+          git config core.sparseCheckoutCone false
+          echo "config/${{ vars.COMPONENT }}-pig-build-config.yaml" >> .git/info/sparse-checkout
+          git fetch -q --depth=1 origin ${rhoai_version}
+          git checkout -q ${rhoai_version}
+          BUILD_CONFIG_PATH=${checkout_dir}/config/${{ vars.COMPONENT }}-pig-build-config.yaml
+          echo "BUILD_CONFIG_PATH=${BUILD_CONFIG_PATH}" >> $GITHUB_OUTPUT
+
+#      - name: Git checkout build config
+#        uses: actions/checkout@v4
+#        with:
+#          repository: ${{ env.GITHUB_ORG }}/RHOAI-Build-Config
+#          ref: ${{ steps.get_branch.outputs.branch }}
+#          path: ${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}
 #          sparse-checkout: |
 #            config/${{ vars.COMPONENT }}-pig-build-config.yaml
 #          sparse-checkout-cone-mode: false
@@ -87,7 +105,7 @@ jobs:
           echo -e "===================="
           
           echo -e "\nChecking and copying the build config ..."
-          ${BUILD_CONFIG_PATH}=${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}/config/${{ vars.COMPONENT }}-pig-build-config.yaml
+          ${BUILD_CONFIG_PATH}=${{ steps.checkout-build-config.outputs.BUILD_CONFIG_PATH }}
           ls -l ${BUILD_CONFIG_PATH}
           cp ${BUILD_CONFIG_PATH} build-config.yaml
           ls -l
