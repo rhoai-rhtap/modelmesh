@@ -49,7 +49,7 @@ jobs:
           ln -s $yq_filename yq
           cp $yq_filename /usr/local/bin/yq
           
-          apt-get install -y git
+          microdnf install -y git
       - name: Get Current branch name
         id: get_branch
         shell: bash
