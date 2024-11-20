@@ -48,6 +48,8 @@ jobs:
           chmod +x $yq_filename
           ln -s $yq_filename yq
           cp $yq_filename /usr/local/bin/yq
+          
+          yum install -y git
       - name: Get Current branch name
         id: get_branch
         shell: bash
