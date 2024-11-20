@@ -87,7 +87,7 @@ jobs:
           checkout_dir=${{ steps.setup.outputs.work_dir }}/cli-config
           mkdir -p $checkout_dir
           cd $checkout_dir
-          git config --global http.sslbackend schannel
+          git config --global http.sslVerify false
           git config --global init.defaultBranch ${PNC_CLI_CONFIG_REVISION}
           git init -q
           git remote add origin ${PNC_CLI_CONFIG_GIT_URL}
