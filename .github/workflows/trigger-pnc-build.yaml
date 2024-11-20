@@ -40,3 +40,5 @@ jobs:
           curl -k https://gitlab.cee.redhat.com/project-ncl/utils/-/raw/master/konflux/configs/pnc_cli/config.yaml?ref_type=heads&inline=false -o config.yaml
           ls -l
           ls -l /home/jboss/
+          cd ../
+          rm -rf $work_dir
