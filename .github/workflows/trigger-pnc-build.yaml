@@ -27,6 +27,7 @@ jobs:
     steps:
       - name: List all files
         run: |
+          pwd
           mkdir pnc
           cd pnc
           BUILD_CONFIG_URL=rhoai-rhtap/RHOAI-Build-Config
