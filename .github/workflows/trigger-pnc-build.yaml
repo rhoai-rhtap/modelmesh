@@ -76,6 +76,5 @@ jobs:
           cat generic_lockfile.yaml
           
           ls -l
-          ls -l /home/jboss/
           cd ../
           rm -rf $work_dir
