@@ -28,6 +28,10 @@ jobs:
       image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
       options: --user root
     steps:
+      - name: Get Current branch name
+        id: get_branch
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
       - name: Init
         id: init
         run: |
@@ -59,10 +63,6 @@ jobs:
           cp $yq_filename /usr/local/bin/yq
           
           microdnf install -y git
-      - name: Get Current branch name
-        id: get_branch
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
       - name: Checkout build config
         id: checkout-build-config
         run: |
