@@ -28,17 +28,26 @@ jobs:
       image: quay.io/redhat-user-workloads/konflux-jbs-pnc-tenant/pnc/pnc-cli:48a761b5093bc474850b2ebcf06641825940deb7
       options: --user root
     steps:
-      - name: Setup
-        id: setup
+      - name: Init
+        id: init
         run: |
           abs_cwd=$(pwd)
           work_dir=pnc-$(date +%s)
           mkdir $work_dir
           cd $work_dir
+          SLACK_MESSAGE=":alert:${{ vars.COMPONENT }}-${{ steps.get_branch.outputs.branch }} PNC build failed. \n Please check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           echo "work_dir=$work_dir" >> $GITHUB_OUTPUT
           echo "abs_cwd=$abs_cwd" >> $GITHUB_OUTPUT
-          
-          #install dependencies
+          {
+            echo "SLACK_MESSAGE<<EOF"
+            echo -e "${SLACK_MESSAGE}"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Install prerequisites
+        id: install-prerequisites
+        run: |
+          cd ${{ steps.init.outputs.work_dir }}
           os="$(uname -s | tr '[:upper:]' '[:lower:]')"
           arch="$(uname -m | sed 's/x86_64/amd64/')"
           yq_version="v4.44.3"
@@ -57,7 +66,7 @@ jobs:
       - name: Checkout build config
         id: checkout-build-config
         run: |
-          checkout_dir=${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}
+          checkout_dir=${{ steps.init.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}
           rhoai_version=${{ steps.get_branch.outputs.branch }}
           mkdir -p $checkout_dir
           cd $checkout_dir
@@ -75,7 +84,7 @@ jobs:
       - name: Checkout PNC cli config
         id: checkout-pnc-cli-config
         run: |
-          checkout_dir=${{ steps.setup.outputs.work_dir }}/cli-config
+          checkout_dir=${{ steps.init.outputs.work_dir }}/cli-config
           mkdir -p $checkout_dir
           cd $checkout_dir
           git config --global http.sslVerify false
@@ -134,11 +143,11 @@ jobs:
         if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_MESSAGE: ':alert:${{ vars.COMPONENT }}-${{ steps.get_branch.outputs.branch }} PNC build failed. \n Please check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          SLACK_MESSAGE: '${{ steps.init.outputs.SLACK_MESSAGE }}'
           SLACK_WEBHOOK: ${{ secrets.SLACK_NOTIFICATIONS_WEBHOOK }}
           MSG_MINIMAL: true
           SLACK_COLOR: ${{ job.status }}
       - name: Cleanup workspace
         if: always()
         run: |
-          rm -rf ${{ steps.setup.outputs.work_dir }}
+          rm -rf ${{ steps.init.outputs.work_dir }}
