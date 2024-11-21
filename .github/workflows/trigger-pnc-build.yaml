@@ -134,7 +134,7 @@ jobs:
 
           echo -e "\nGetting the list of built files (to be used later in the container build) ..."
           jq '[.builds[].builtArtifacts[]?.downloadUrl ]' "${work_dir}/$PNC_CLI_OUTPUT_FILE" > "${work_dir}/pnc-file-list.json"
-          cat ${work_dir}pnc-file-list.json
+          cat ${work_dir}/pnc-file-list.json
 
           
           jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: ("sha256:" + .sha256)}] }' ${work_dir}/$PNC_CLI_OUTPUT_FILE | yq -p json > "${work_dir}/artifacts.lock.yaml"
