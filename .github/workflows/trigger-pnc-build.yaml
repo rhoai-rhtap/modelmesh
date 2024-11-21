@@ -54,7 +54,7 @@ jobs:
         id: get_branch
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-      - name: Git checkout build config
+      - name: Checkout build config
         id: checkout-build-config
         run: |
           checkout_dir=${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}
@@ -72,15 +72,6 @@ jobs:
           BUILD_CONFIG_PATH=${checkout_dir}/config/${{ vars.COMPONENT }}-pig-build-config.yaml
           echo "BUILD_CONFIG_PATH=${BUILD_CONFIG_PATH}" >> $GITHUB_OUTPUT
 
-#      - name: Git checkout build config
-#        uses: actions/checkout@v4
-#        with:
-#          repository: ${{ env.GITHUB_ORG }}/RHOAI-Build-Config
-#          ref: ${{ steps.get_branch.outputs.branch }}
-#          path: ${{ steps.setup.outputs.work_dir }}/${{ steps.get_branch.outputs.branch }}
-#          sparse-checkout: |
-#            config/${{ vars.COMPONENT }}-pig-build-config.yaml
-#          sparse-checkout-cone-mode: false
       - name: Checkout PNC cli config
         id: checkout-pnc-cli-config
         run: |
@@ -102,7 +93,7 @@ jobs:
       - name: Run PNC Build
         run: |
           BUILD_CONFIG_URL=rhoai-rhtap/RHOAI-Build-Config
-          BUILD_CONFIG_REVISION=rhoai-2.13
+          BUILD_CONFIG_REVISION=${{ steps.get_branch.outputs.branch }}
           BUILD_CONFIG_PATH=odh-pig-builds/build-config.yaml
           
           echo -e "===================="
@@ -138,6 +129,14 @@ jobs:
           jq '{metadata: {version: "1.0"}, artifacts: [.builds[].builtArtifacts[]? | select(.downloadUrl | endswith(".zip")) | {download_url: .downloadUrl , checksums: ("sha256:" + .sha256)}] }' $PNC_CLI_OUTPUT_FILE | yq -p json > "artifacts.lock.yaml"
           cat artifacts.lock.yaml
           ls -l
+      - name: Send Slack Notification
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_MESSAGE: ':alert:${{ vars.COMPONENT }}-${{ steps.get_branch.outputs.branch }} PNC build failed. \n Please check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_NOTIFICATIONS_WEBHOOK }}
+          MSG_MINIMAL: true
+          SLACK_COLOR: ${{ job.status }}
       - name: Cleanup workspace
         if: always()
         run: |
