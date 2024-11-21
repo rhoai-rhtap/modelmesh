@@ -10,8 +10,8 @@ RUN ls -la ./cachi2/output/deps
 # Install packages for the install script and extract archives
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y unzip jq wget
 
-RUN cd ./cachi2/output/deps/generic && \
-    for file in *.zip; do unzip -d /root/ "$file"; done
+RUN cd ./cachi2/output/deps/generic && ls -l && \
+    for file in *.zip; ls -l "$file" do unzip -d /root/ "$file"; done
 
 
 ###############################################################################
