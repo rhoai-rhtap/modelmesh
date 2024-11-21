@@ -147,6 +147,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_NOTIFICATIONS_WEBHOOK }}
           MSG_MINIMAL: true
           SLACK_COLOR: ${{ job.status }}
+          SLACK_FOOTER: ''
       - name: Cleanup workspace
         if: always()
         run: |
