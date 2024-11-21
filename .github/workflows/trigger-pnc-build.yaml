@@ -2,11 +2,12 @@ name: Trigger PNC Build
 
 on:
   workflow_dispatch:
-#  push:
-#    branches:
-#      - 'rhoai-*'
-#    paths:
-#      - build/operator-nudging.yaml
+  push:
+    branches:
+      - 'rhoai-2.1[6-9]+'
+    paths-ignore:
+      - .tekton/**
+      - .github/**
 
 env:
   GITHUB_ORG: rhoai-rhtap
@@ -21,6 +22,7 @@ permissions:
 
 jobs:
   run-pnc-build:
+    if: ${{ github.ref_name != 'main' }}
     runs-on:
       - self-hosted
       - pnc
