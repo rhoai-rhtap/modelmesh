@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-  # test comment poc 2
+  # test comment poc 3
   annotations:
     build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/modelmesh?rev={{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
