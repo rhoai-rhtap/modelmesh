@@ -35,4 +35,4 @@ start_etcd.sh
 # ASoC Scan
 .scans/
 SAClient*
-
+push.sh
