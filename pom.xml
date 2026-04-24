@@ -66,7 +66,7 @@
     <annotation-version>9.0.87</annotation-version>
     <guava-version>33.1.0-jre</guava-version>
     <jackson-databind-version>2.16.2</jackson-databind-version>
-    <gson-version>2.10.1</gson-version>
+    <gson-version>2.14.0</gson-version>
     <thrift-version>0.20.0</thrift-version>
     <eclipse-collections-version>11.1.0</eclipse-collections-version>
     <log4j2-version>2.23.1</log4j2-version>
