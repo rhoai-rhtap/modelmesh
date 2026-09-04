@@ -153,7 +153,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <!-- <version>2.22.2</version> -->
-        <version>3.0.0-M5</version>
+        <version>3.6.0</version>
         <!-- don't run tests in parallel for now -->
         <configuration>
           <useFile>false</useFile> <!-- log full results to console -->
