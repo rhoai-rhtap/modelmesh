@@ -22,7 +22,7 @@ RUN echo "$PNC_FILES_JSON" | jq -r '.[] | select(test("\\.zip$"))' | \
 
 ###############################################################################
 #latest tag
-FROM registry.redhat.io/ubi8/openjdk-17-runtime@sha256:8e863153659dba9ee288b97b7cdf7a83274dd78b26da1e5da6798d0bd45166e8 as runtime
+FROM registry.redhat.io/ubi8/openjdk-17-runtime@sha256:11a3bed44171c78ee00bb0c9e85ef086f5be14698c6fbfb4feaccb9d201b31a9 as runtime
 
 ## Build args to be used at this step
 ARG USERID=2000
