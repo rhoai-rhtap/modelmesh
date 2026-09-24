@@ -2,7 +2,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.redhat.io/ubi8/ubi-minimal@sha256:7583ca0ea52001562bd81a961da3f75222209e6192e4e413ee226cff97dbd48c AS stage
+FROM registry.redhat.io/ubi8/ubi-minimal@sha256:93288f46bf2dfb7ed83078d5d9f32d4dd8c0524bfb3afe8b5719aa636a5ecbd8 AS stage
 
 # Define a build argument for the PNC list of built files
 ARG PNC_FILES_JSON
